@@ -5,6 +5,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development babel-node src",
     "test": "cross-env NODE_ENV=test karma start --single-run",
+    "test:watch": "npm run test -- --auto-watch --no-single-run",
     "build": "npm run build:lib && npm run build:es && npm run build:umd && npm run build:umd:min",
     "build:lib": "babel src --out-dir lib",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
