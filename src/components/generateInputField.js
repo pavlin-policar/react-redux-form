@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { capitalize, camelCase, forEach } from 'lodash';
 import invariant from 'invariant';
+import classNames from 'classnames';
 
 import withFormId from './withFormId';
 import {
@@ -11,8 +12,6 @@ import {
   blur,
 } from '../actions';
 import { getFieldValue, getFieldTouched } from '../selectors';
-
-import styles from '../styles.css';
 
 
 /**
@@ -26,7 +25,7 @@ import styles from '../styles.css';
  * @return {Component}        A `InputField` component that renders the input
  *   according to the specified options.
  */
-export function generateInputComponent(type, { validate = '' } = {}) {
+export function generateInputComponent(type, { validate = '', className } = {}) {
   return class InputField extends React.Component {
     static displayName = `${capitalize(camelCase(type))}Field`;
 
@@ -139,7 +138,7 @@ export function generateInputComponent(type, { validate = '' } = {}) {
           name={this.props.name}
           id={this.props.name}
           value={this.props.value}
-          className={this.props.className}
+          className={classNames(className, this.props.className)}
           autoFocus={this.props.autoFocus || false}
           disabled={this.props.disabled || false}
           placeholder={this.props.placeholder || ''}

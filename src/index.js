@@ -3,12 +3,16 @@ import {
   createFormSubmitAction,
   createFormValidationAction
 } from './createFormActions';
-import generateInputField from 'components/generateInputField';
+import generateInputField from './components/generateInputField';
+import reducer from './reducer';
+import sagas from './sagas';
 
 
 export {
   createForm,
-  createFormActions,
+  createFormSubmitAction,
   createFormValidationAction,
   generateInputField,
+  reducer as formReducer,
+  sagas as formSagas,
 };
