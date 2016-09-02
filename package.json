@@ -1,7 +1,7 @@
 {
   "name": "@policar/react-redux-form",
   "version": "0.1.1",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development babel-node src",
     "test": "cross-env NODE_ENV=test karma start --single-run",
