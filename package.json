@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "main": "src/index.js",
   "scripts": {
+    "clean": "rimraf lib dist es coverage",
     "start": "cross-env NODE_ENV=development babel-node src",
     "test": "cross-env NODE_ENV=test karma start --single-run",
     "test:watch": "npm run test -- --auto-watch --no-single-run",
@@ -10,7 +11,8 @@
     "build:lib": "babel src --out-dir lib",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
     "build:umd": "cross-env NODE_ENV=development webpack src/index.js dist/react-redux-form.js",
-    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/react-redux-form.min.js"
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/react-redux-form.min.js",
+    "prepublish": "npm run clean && npm run build"
   },
   "author": "Pavlin Poličar <pavlin.g.p@gmail.com>",
   "license": "MIT",
@@ -68,6 +70,7 @@
     "react-redux": "^4.4.5",
     "redux": "^3.5.2",
     "redux-saga": "^0.11.1",
+    "rimraf": "^2.5.4",
     "webpack": "2.1.0-beta.15"
   },
   "peerDependencies": {
