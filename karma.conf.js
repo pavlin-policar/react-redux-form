@@ -52,7 +52,7 @@ module.exports = function(config) {
     },
 
     preprocessors: {
-      'src/**/*.js': ['webpack', 'sourcemap', 'coverage']
+      'src/**/*.js': ['webpack', 'sourcemap']
     },
 
     plugins: [
@@ -70,7 +70,7 @@ module.exports = function(config) {
       root: path.join(__dirname, 'node_modules')
     },
 
-    reporters: ['mocha', 'coverage'],
+    reporters: ['mocha'],
 
     coverageReporter: {
       dir : 'coverage/',
