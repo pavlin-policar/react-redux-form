@@ -9,7 +9,6 @@
     "test:watch": "npm run test -- --auto-watch --no-single-run"
   },
   "author": "Pavlin Poličar <pavlin.g.p@gmail.com>",
-  "license": "MIT",
   "keywords": [
     "react",
     "reactjs",
@@ -17,6 +16,7 @@
     "redux",
     "form"
   ],
+  "license": "MIT",
   "main": "./lib/index.js",
   "babel": {
     "presets": [
@@ -24,7 +24,9 @@
       "react",
       "stage-0"
     ],
-    "plugins": [],
+    "plugins": [
+      "transform-runtime"
+    ],
     "env": {
       "production": {
         "plugins": []
