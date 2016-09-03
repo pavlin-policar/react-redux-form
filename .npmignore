@@ -8,5 +8,8 @@ coverage/
 # Dependency directory
 node_modules/
 
-# Build directory
-lib/
+# Source directory
+src/
+
+# Config files
+internals/

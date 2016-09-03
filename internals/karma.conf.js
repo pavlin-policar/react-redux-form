@@ -10,7 +10,6 @@ module.exports = function(config) {
     frameworks: ['mocha'],
 
     files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
       'src/**/*.js'
     ],
 
@@ -30,6 +29,7 @@ module.exports = function(config) {
             query: {
               presets: ['es2015', 'react', 'stage-0'],
               plugins: [
+                'transform-runtime',
                 'transform-react-remove-prop-types'
               ]
             }

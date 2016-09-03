@@ -8,22 +8,16 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel',
-        exclude: path.resolve(__dirname, 'node_modules'),
+        exclude: [/node_modules/, /tests/],
         query: {
           presets: ['es2015', 'react', 'stage-0'],
-          plugins: [
-            'transform-react-remove-prop-types'
-          ]
+          plugins: [],
         }
       },
       {
         test: /\.json$/,
         loader: 'json',
-      }
+      },
     ]
-  },
-  externals: {
-    'react/lib/ExecutionEnvironment': true,
-    'react/lib/ReactContext': true
   }
 };
