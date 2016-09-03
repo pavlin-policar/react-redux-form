@@ -1,7 +1,7 @@
 import createForm from './createForm';
 import {
   createFormSubmitAction,
-  createFormValidationAction
+  createFormValidationAction,
 } from './createFormActions';
 import generateInputField from './components/generateInputField';
 import reducer from './reducer';
