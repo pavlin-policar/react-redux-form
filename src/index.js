@@ -1,18 +1,5 @@
-import createForm from './createForm';
-import {
-  createFormSubmitAction,
-  createFormValidationAction,
-} from './createFormActions';
-import generateInputField from './components/generateInputField';
-import reducer from './reducer';
-import sagas from './sagas';
-
-
-export {
-  createForm,
-  createFormSubmitAction,
-  createFormValidationAction,
-  generateInputField,
-  reducer as formReducer,
-  sagas as formSagas,
-};
+export { default as createForm } from './createForm';
+export { createFormSubmitAction, createFormValidationAction } from './createFormActions';
+export { default as generateInputField } from './components/generateInputField';
+export { default as formReducer } from './reducer';
+export { default as formSagas } from './sagas';
