@@ -6,7 +6,7 @@ import React from 'react';
 
 
 describe('generateInputComponent', () => {
-  const Component = generateInputComponent('text');
+  let Component = generateInputComponent('text');
   let context;
   beforeEach(() => {
     context = {
@@ -158,6 +158,20 @@ describe('generateInputComponent', () => {
       );
       renderedComponent.find('input').simulate('change', event);
       expect(onChangeSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('asynchronous validation', () => {
+    it('should trigger async validation on blur by default', () => {
+      const blurSpy = expect.createSpy();
+      const validator1 = expect.createSpy();
+      const validator2 = expect.createSpy();
+      const renderedComponent = shallowInput(
+        <Component validateAsync={{ validator1, validator2 }} blur={blurSpy} />
+      );
+      renderedComponent.find('input').simulate('blur');
+      expect(validator1).toHaveBeenCalled();
+      expect(validator2).toHaveBeenCalled();
     });
   });
 });
