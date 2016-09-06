@@ -79,11 +79,13 @@ export function generateInputComponent(type, { validate = '', className } = {}) 
     }
 
     componentWillMount() {
-      this.context.form.attach({
-        name: this.props.name,
-        validationString: `${this.props.validate}|${validate}`,
-        initialValue: this.props.value,
-      });
+      if (this.props.name) {
+        this.context.form.attach({
+          name: this.props.name,
+          validationString: `${this.props.validate}|${validate}`,
+          initialValue: this.props.value,
+        });
+      }
     }
 
     shouldComponentUpdate() {
