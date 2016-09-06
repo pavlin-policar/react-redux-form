@@ -13,7 +13,8 @@ import {
   SUBMIT_SUCCESS,
   SUBMIT_FAILURE,
   VALIDATION_REQUEST,
-  RECEIVE_VALIDATION_ERRORS,
+  VALIDATION_NO_ERRORS,
+  VALIDATION_ERRORS,
 } from './constants';
 
 
@@ -27,11 +28,19 @@ export const change = createAction(CHANGE);
 
 export const focus = createAction(FOCUS);
 export const blur = createAction(BLUR);
-export const touch = createAction(TOUCH);
+export const touch = createAction(
+  TOUCH,
+  ({ field, ...rest }) => {
+    // Can accept single field to touch
+    if (field) return { fields: [field], ...rest };
+    return { ...rest };
+  }
+);
 
 export const submit = createAction(SUBMIT_REQUEST);
 export const submitSuccessful = createAction(SUBMIT_SUCCESS);
 export const submitFailed = createAction(SUBMIT_FAILURE);
 
 export const requestAsyncValidation = createAction(VALIDATION_REQUEST);
-export const receiveAsyncValidationErrors = createAction(RECEIVE_VALIDATION_ERRORS);
+export const noAsyncErrors = createAction(VALIDATION_NO_ERRORS);
+export const receiveAsyncErrors = createAction(VALIDATION_ERRORS);

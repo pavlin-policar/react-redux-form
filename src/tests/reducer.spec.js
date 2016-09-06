@@ -1,282 +1,152 @@
 import expect from 'expect';
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
+import sinon from 'sinon';
 
-import { Form, Field, forms, form, field } from '../reducer';
+import * as validationFunctions from '../validators';
 import {
-  registerForm,
-  unregisterForm,
-  attachToForm,
-  detachFromForm,
-  change,
-  blur,
-  submitFailed,
-  requestAsyncValidation,
-  receiveAsyncValidationErrors,
-} from '../actions';
+  syncValidator,
+  SyncValidator,
+  asyncValidator,
+  AsyncValidator,
+  field,
+  Field,
+  form,
+  Form,
+  forms,
+  // helper functions
+  getFormData,
+  validateValue,
+} from '../reducer';
+import * as actions from '../actions';
 
 
 describe('Form reducers', () => {
-  describe('Field data type', () => {
-    it('should be valid when there are no errors', () => {
-      const fieldObj = new Field();
-      expect(fieldObj.isValid()).toBe(true);
+  describe('the async validator reducer', () => {
+    it('should have its `isValidating` flag to false by default');
+    it('should set its `isValidating` flag to true when a validation is requested');
+    it('should reset its `isValidating` flag to false when validation returns errors');
+    it('should reset its `isValidating` flag to false when validation returns no errors');
+  });
+
+  describe('the sync validator reducer');
+
+  describe('the field reducer', () => {
+    describe('attaching to form', () => {
+      it('should set its name');
+      it('should set its initial value when it is passed', () => {
+        let state = field(state, actions.attachToForm({ name: 'f', initialValue: 'val' }));
+        expect(state.get('value')).toBe('val');
+      });
+      it('should parse and set its validation string for sync validations');
+      it('should parse and set its async validators');
+      it('should need validation when it is first attached to the form');
     });
 
-    it('should be invalid when there are errors', () => {
-      const fieldObj = new Field({ errors: List(['error']) });
-      expect(fieldObj.isValid()).toBe(false);
+    describe('blurring', () => {
+      it('should set its `touched` flag to true');
+    });
+
+    describe('touching', () => {
+      it('should set its `touched` flag to true if no fields are specified');
+      it('should set its `touched` flag to  if the fields is specified');
+      it('should not set its `touched` flag to true if the fields is not among those specified');
+    });
+
+    describe('changing', () => {
+      it('should change its `value`');
+      it('should set its `needsValidation` flag');
+    });
+
+    describe('form submit attempt', () => {
+      it('should clear any previous server submit errors');
+    });
+
+    describe('form submit failure', () => {
+      it('should merge any form errors from the server into its errors');
+    });
+
+    describe('asynchronous validation', () => {
+      it('should propagate the action to the `asyncValidators` reducer');
     });
   });
 
-  describe('Form data type', () => {
-    describe('getData', () => {
-      it('should get the data in the fields', () => {
-        const formObj = new Form({
-          fields: Map({
-            foo: new Field({ value: 'foo' }),
-            bar: new Field({ value: 'bar' }),
-            baz: new Field({ value: 'baz' }),
-          }),
-        });
-        expect(formObj.getData()).toEqual(Map({ foo: 'foo', bar: 'bar', baz: 'baz' }));
-      });
+  describe('the form reducer', () => {
+    describe('attaching a field to form', () => {
+      it('should create a field in its fields with the field name');
+      it('should validate the form state after attaching a field');
     });
-    describe('getErrors', () => {
-      it('should get the errors in the fields', () => {
-        const formObj = new Form({
-          fields: Map({
-            foo: new Field({ errors: List() }),
-            bar: new Field({ errors: List([1]) }),
-            baz: new Field({ errors: List([1, 2]) }),
-          }),
-        });
-        expect(formObj.getErrors()).toEqual(
-          Map({ foo: List(), bar: List([1]), baz: List([1, 2]) })
-        );
-      });
-    });
-    describe('parsingValidators', () => {
-      it('should handle multiple validators', () => {
-        const result = Form.parseValidators('foo|bar');
-        expect(result).toEqual([
-          { validator: 'foo', params: [] },
-          { validator: 'bar', params: [] },
-        ]);
-      });
 
-      it('should handle parameters', () => {
-        const result = Form.parseValidators('foo:bar,baz|bim:bam');
-        expect(result).toEqual([
-          { validator: 'foo', params: ['bar', 'baz'] },
-          { validator: 'bim', params: ['bam'] },
-        ]);
-      });
+    describe('changing the value', () => {
+      it('should revalidate the entire form');
+      it('should propagate the action to the `field` reducer');
+    });
 
-      it('should convert dashes to camel case', () => {
-        const result = Form.parseValidators('i-am-a-dash');
-        expect(result).toEqual([{ validator: 'iAmADash', params: [] }]);
+    describe('a submit request', () => {
+      it('should set the `submitting` flag to true');
+    });
+
+    describe('a submission response', () => {
+      it('should set the `submitting` flag to false');
+      it('should propagate the action to the `field` reducer');
+    });
+  });
+
+  describe('the forms reducer', () => {
+    describe('registering a form', () => {
+      it('should set a field with the registered form name with a new form', () => {
+        let state;
+        state = forms(state, actions.registerForm('f1'));
+        state = forms(state, actions.registerForm('f2'));
+        expect(state.get('f1')).toBeA(Form);
+        expect(state.get('f2')).toBeA(Form);
       });
     });
+    describe('unregistering a form', () => {
+      it('should remove the field from the list of forms', () => {
+        let state;
+        state = forms(state, actions.registerForm('f1'));
+        state = forms(state, actions.registerForm('f2'));
+
+        state = forms(state, actions.unregisterForm('f2'));
+        expect(state.get('f1')).toBeA(Form);
+        expect(state.get('f2')).toNotExist();
+      });
+    });
+    describe('any other action', () => {
+      it('should be propagated down to the `form` reducer');
+    });
+  });
+
+  describe('sychronous validation helper methods', () => {
+    describe('getFormData', () => {
+      it('should extract any form data from a form', () => {
+        let state;
+        state = form(state, actions.attachToForm({ name: 'f1', initialValue: 'val1' }));
+        state = form(state, actions.attachToForm({ name: 'f2', initialValue: 'val2' }));
+        state = form(state, actions.attachToForm({ name: 'f3', initialValue: 'val3' }));
+
+        expect(getFormData(state)).toEqual(Map({ f1: 'val1', f2: 'val2', f3: 'val3' }));
+      });
+    });
+
     describe('validateValue', () => {
-      it('should return an array of errors if anything is wrong', () => {
-        const formObj = new Form();
-        expect(
-          formObj.validateValue('21', [
-            { validator: 'alpha' },
-            { validator: 'length', params: ['3'] },
-          ])
-        ).toEqual(['alpha', 'length']);
-      });
-    });
-    describe('isValid', () => {
-      it('should be valid if the fields contain no errors', () => {
-        const formObj = new Form({ fields: Map({
-          one: new Field({ errors: List() }),
-          two: new Field({ errors: List() }),
-          three: new Field({ errors: List() }),
-        }) });
-        expect(formObj.isValid()).toBe(true);
+      beforeEach(() => {
+        sinon.stub(validationFunctions, 'length').returns(false);
+        sinon.stub(validationFunctions, 'alpha').returns(false);
+        sinon.stub(validationFunctions, 'required').returns(true);
+      })
+
+      it('should validate a value when it doesn\'t have to deal with other fields', () => {
+        const validators = List([
+          new SyncValidator({ name: 'length' }),
+          new SyncValidator({ name: 'alpha' }),
+          new SyncValidator({ name: 'required' }),
+        ]);
+        const otherValues = new Map();
+
+        expect(validateValue('123', validators, otherValues)).toEqual(['length', 'alpha'])
       });
 
-      it('should be invalid if the fields contain errors', () => {
-        const formObj = new Form({ fields: Map({
-          one: new Field({ errors: List(['error']) }),
-          two: new Field({ errors: List() }),
-          three: new Field({ errors: List() }),
-        }) });
-        expect(formObj.isValid()).toBe(false);
-      });
-    });
-    describe('validate', () => {
-      const formObj = new Form({ fields: Map({
-        one: new Field({
-          value: '',
-          validators: [
-            { validator: 'required' },
-            { validator: 'length', params: ['3'] },
-          ],
-        }),
-        two: new Field({
-          value: '123',
-          validators: [
-            { validator: 'alpha' },
-            { validator: 'length', params: ['3'] },
-          ],
-        }),
-      }) });
-      expect(
-        formObj.validate().getIn(['fields', 'one', 'errors'])
-      ).toEqual(List(['required', 'length']));
-      expect(
-        formObj.validate().getIn(['fields', 'two', 'errors'])
-      ).toEqual(List(['alpha']));
-    });
-  });
-
-  describe('Forms reducer', () => {
-    describe('registerForm action', () => {
-      it('should register a form', () => {
-        const initialState = fromJS({ existing: new Form() });
-        const state = forms(initialState, registerForm('newForm'));
-        expect(state.has('existing')).toBe(true);
-        expect(state.has('newForm')).toBe(true);
-        expect(state.get('newForm')).toBeA(Form);
-      });
-    });
-
-    describe('unregisterForm action', () => {
-      it('should remove a form', () => {
-        const initialState = fromJS({ one: new Form(), two: new Form() });
-        const state = forms(initialState, unregisterForm('two'));
-        expect(state.has('one')).toBe(true);
-        expect(state.has('two')).toBe(false);
-      });
-    });
-  });
-
-  describe('Form reducer', () => {
-    describe('attachToForm action', () => {
-      it('should attach a field to the form', () => {
-        const initialState = new Form({ fields: Map({ existing: new Field() }) });
-        const state = form(initialState, attachToForm({ name: 'newField' }));
-        expect(state.hasIn(['fields', 'existing'])).toBe(true);
-        expect(state.hasIn(['fields', 'newField'])).toBe(true);
-        expect(state.getIn(['fields', 'newField'])).toBeA(Field);
-      });
-    });
-
-    describe('detachFromForm action', () => {
-      it('should detach a field from the form', () => {
-        const initialState = new Form({ fields: Map({ one: new Field(), two: new Field() }) });
-        const state = form(initialState, detachFromForm({ name: 'two' }));
-        expect(state.hasIn(['fields', 'one'])).toBe(true);
-        expect(state.hasIn(['fields', 'two'])).toBe(false);
-      });
-    });
-  });
-
-  describe('Field reducer', () => {
-    describe('attachToForm action', () => {
-      it('should parse its validation string if one is provided', () => {
-        const initialState = new Field();
-        const state = field(initialState, attachToForm({ validationString: 'required' }));
-        expect(state.get('validators')).toEqual([{ validator: 'required', params: [] }]);
-      });
-
-      it('should not change the default validation string if none is provided', () => {
-        const initialState = new Field();
-        const expected = initialState.get('validationString');
-        const state = field(initialState, attachToForm({ validationString: undefined }));
-        expect(state.get('validationString')).toEqual(expected);
-      });
-
-      it('should set its default value when it is provided', () => {
-        const initialState = new Field();
-        const state = field(initialState, attachToForm({ initialValue: 'foo' }));
-        expect(state.get('value')).toBe('foo');
-      });
-
-      it('should set its name', () => {
-        const initialState = new Field();
-        const state = field(initialState, attachToForm({ name: 'field' }));
-        expect(state.get('name')).toBe('field');
-      });
-    });
-
-    describe('change action', () => {
-      it('should set its value', () => {
-        const initialState = new Field({ value: 'original' });
-        const state = field(initialState, change({ value: 'changed' }));
-        expect(state.get('value')).toEqual('changed');
-      });
-
-      it('should set its `needsValidation` flag when its value changes', () => {
-        const initialState = new Field({ name: 'field', value: 'original' });
-        const state = field(initialState, change({ name: 'field', value: 'changed' }));
-        expect(state.get('needsValidation')).toBe(true);
-      });
-
-      it('should set its `needsValidation` flag when its validation relies on another field', () => {
-        const initialState = new Field({
-          name: 'field',
-          value: 'original',
-          validators: [{ name: 'someValidation', params: ['anotherField'] }],
-        });
-        const state = field(initialState, change({ name: 'anotherField', value: 'changed' }));
-        expect(state.get('needsValidation')).toBe(true);
-      });
-    });
-
-    describe('blur action', () => {
-      it('should set itself to touched on a blur event', () => {
-        const initialState = new Field();
-        expect(initialState.get('touched')).toBe(false);
-        const state = field(initialState, blur());
-        expect(state.get('touched')).toBe(true);
-      });
-    });
-
-    describe('submitFailure action', () => {
-      it('should set its errors to the server response errors', () => {
-        const errors = ['required', 'email'];
-        const initialState = new Field({
-          name: 'field',
-          errors: ['this', 'should', 'be', 'overwritten'],
-        });
-        const state = field(initialState, submitFailed({
-          errors: {
-            field: errors,
-          },
-        }));
-        expect(state.get('errors')).toEqual(fromJS(errors));
-      });
-    });
-
-    describe('requestAsyncValidation action', () => {
-      it('should set its `validating` flag to true', () => {
-        const initialState = new Field();
-        expect(initialState.get('validating')).toBe(false);
-        const state = field(initialState, requestAsyncValidation());
-        expect(state.get('validating')).toBe(true);
-      });
-    });
-
-    describe('receiveAsyncValidationErrors action', () => {
-      it('should set its `validating` flag to false', () => {
-        const initialState = new Field({ validating: true });
-        const state = field(initialState, receiveAsyncValidationErrors({
-          errors: { isUnique: false, email: false },
-        }));
-        expect(state.get('validating')).toBe(false);
-      });
-
-      it('should add the async valiation errors to the existing errors', () => {
-        const initialState = new Field(fromJS({ errors: ['existing', 'error'] }));
-        const state = field(initialState, receiveAsyncValidationErrors({
-          errors: { isUnique: false, email: false },
-        }));
-        expect(state.get('errors')).toEqual(fromJS(['existing', 'error', 'isUnique', 'email']));
-      });
     });
   });
 });

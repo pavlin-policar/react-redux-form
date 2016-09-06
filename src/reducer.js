@@ -14,171 +14,234 @@ import {
   SUBMIT_SUCCESS,
   SUBMIT_FAILURE,
   VALIDATION_REQUEST,
-  RECEIVE_VALIDATION_ERRORS,
+  VALIDATION_NO_ERRORS,
+  VALIDATION_ERRORS,
 } from './constants';
-import * as validators from './validators';
+import * as validationFunctions from './validators';
+
+
+export const SyncValidator = Record({
+  name: '',
+  params: [],
+});
+export const syncValidator = (state = new SyncValidator(), action) => {
+  const { type, payload } = state;
+
+  switch (type) {
+    default:
+      return state;
+  }
+}
+
+/**
+ * Parse the validation string passed down from props.
+ *
+ * @param {string} validationString
+ * @return {List<SyncValidator>}
+ */
+export const parseSyncValidators = (validationString) => {
+  // Parse validators, remove duplicates
+  const strValidators = Object.keys(
+    validationString
+      .split('|')
+      .reduce((acc, el) => (el ? { ...acc, [el]: null } : acc), {})
+  );
+  return List(strValidators).map((strValidator) => {
+    let name = strValidator;
+    let params = [];
+
+    // Parameters are separated from the validation with a colon
+    if (strValidator.indexOf(':') > 0) {
+      [name, ...params] = strValidator.split(':');
+
+      // Multiple parameters may be delimited by a comma
+      if (params[0].indexOf(',') > -1) {
+        params = params[0].split(',');
+      }
+    }
+    // Validator names don't have to be camel case, they can be delimited by
+    // dashes
+    name = camelCase(name);
+    // Replace any empty string parameters with undefined, to deal with
+    // params in format validate:,param
+    params = params.map((el) => (isEmpty(el) ? undefined : el));
+
+    return new SyncValidator({ name, params });
+  });
+};
 
 
 /**
- * Data types
+ * Parse the object with async validator functions.
+ *
+ * @param  {object} validators
+ * @return {List<AsyncValidator>}
+ */
+export const parseAsyncValidators = (validators) =>
+  List(Object.keys(validators)).map((name) => new AsyncValidator({ name }));
+
+/**
+ * Async validator
  */
 
-const FieldRecord = Record({
+export const AsyncValidator = Record({
+  name: '',
+  isValidating: false,
+});
+export const asyncValidator = (state = new AsyncValidator(), action) => {
+  const { type, payload } = action;
+  // Check if the validator matches payload validator name
+  if (state.get('name') !== payload.validator) {
+    return state;
+  }
+  switch (type) {
+    case VALIDATION_REQUEST:
+      return state.set('isValidating', true);
+    case VALIDATION_NO_ERRORS:
+    case VALIDATION_ERRORS:
+      return state.set('isValidating', false);
+  }
+}
+
+/**
+ * Field
+ */
+
+export const fieldNeedsValidation = (field, changedFieldName) => field.set(
+  'needsValidation',
+  changedFieldName === field.name ||
+  field.get('syncValidators').map(
+    validator => validator.get('params').some(param => param === changedFieldName)
+  ).some(req => req)
+);
+
+export const Field = Record({
   name: '',
   value: '',
-  validators: List(),
-  errors: List(),
+  syncValidators: List(),
+  syncErrors: List(),
+  asyncValidators: List(),
+  asyncErrors: List(),
+  serverErrors: List(),
   needsValidation: true,
   touched: false,
-  validating: false,
 });
-export class Field extends FieldRecord {
-  isValid() { return this.get('errors').isEmpty(); }
-
-  setNeedsValidation({ name }) {
-    const needsValidation = this.validators.map(
-      val => val.params.some(param => param === name)
-    ).some(req => req) || name === this.name;
-    return this.set('needsValidation', needsValidation);
-  }
-}
-
-const FormRecord = Record({
-  fields: Map(),
-  submitting: false,
-});
-export class Form extends FormRecord {
-  getData() { return this.fields.map(f => f.get('value')); }
-  getErrors() { return this.fields.map(f => f.get('errors')); }
-
-  /**
-   * Parse the validation string passed down from props and return an object
-   * containing data to execute the validator.
-   *
-   * @return {array}
-   * @private
-   */
-  static parseValidators(validationString) {
-    // Parse validators, remove duplicates, include default validators
-    const strValidators = Object.keys(
-      validationString.split('|')
-        .reduce((acc, el) => (el ? { ...acc, [el]: null } : acc), {})
-    );
-    return strValidators.map((strValidator) => {
-      let validator = strValidator;
-      let params = [];
-
-      // Parameters are separated from the validation with a colon
-      if (strValidator.indexOf(':') > 0) {
-        [validator, ...params] = strValidator.split(':');
-
-        // Multiple parameters may be delimited by a comma
-        if (params[0].indexOf(',') > -1) {
-          params = params[0].split(',');
-        }
-      }
-      validator = camelCase(validator);
-      // Replace any empty string parameters with undefined
-      params = params.map((el) => (isEmpty(el) ? undefined : el));
-
-      return { validator, params };
-    });
-  }
-
-  validateValue(value, validatorsParams) {
-    const errors = [];
-
-    validatorsParams.forEach(({ validator, params }) => {
-      // Confirm that the validator is recognized
-      invariant(
-        validator in validators,
-        `${validator} validator is not recognized in validators.js`
-      );
-
-      if (!value || !validators[validator](value, params, this.getData().toJS())) {
-        errors.push(validator);
-      }
-    });
-
-    return errors;
-  }
-
-  validate() {
-    return this.set('fields', this.fields.map((f) => {
-      if (f.get('needsValidation')) {
-        return f.set(
-          'errors',
-          List(this.validateValue(f.get('value'), f.get('validators')))
-        ).set('needsValidation', false);
-      }
-      return f;
-    }));
-  }
-
-  isValid() { return this.fields.map(f => f.isValid()).every(f => f === true); }
-}
-
-/**
- * Reducers
- */
-
 export const field = (state = new Field(), action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case ATTACH_TO_FORM:
-      return (state
-        .set('validators', Form.parseValidators(trim(payload.validationString, '|')))
-        .set('value', payload.initialValue || state.get('value'))
-        .set('name', payload.name)
-      );
+    case ATTACH_TO_FORM: {
+      const {
+        name,
+        initialValue,
+        validationString,
+        asyncValidators,
+      } = payload;
+      let newState = state;
+
+      newState = newState.set('name', name);
+      if (initialValue) {
+        newState = newState.set('value', initialValue);
+      }
+      if (validationString) {
+        newState = newState.set('syncValidators', parseSyncValidators(trim(validationString, '|')));
+      }
+      if (asyncValidators) {
+        newState = newState.set('asyncValidators', parseAsyncValidators(asyncValidators));
+      }
+      return newState;
+    }
     case BLUR:
       return state.set('touched', true);
     case TOUCH:
-      if (payload.fields.includes(state.get('name'))) {
+      // Mark as touched if no fields are specified or if it specifically
+      // specified
+      if (!payload.fields || payload.fields.includes(state.get('name'))) {
         return state.set('touched', true);
       }
       return state;
-    case CHANGE:
-      return state.set('value', payload.value).setNeedsValidation(payload);
-    case SUBMIT_FAILURE: {
-      const { errors } = payload;
-      return state.set('errors', List(errors[state.get('name')]));
+    case CHANGE: {
+      state = state.set('value', payload.value);
+      state = state.set('needsValidation', fieldNeedsValidation(state, action.name));
+      return state;
     }
+    case SUBMIT_FAILURE:
+      return state.set('syncErrors', List(payload.errors[state.get('name')]));
     case VALIDATION_REQUEST:
-      return state.set('validating', true);
-    case RECEIVE_VALIDATION_ERRORS: {
-      // Extract the error names from the error response
-      const errorNames = payload.errors ? Object.keys(payload.errors) : [];
-      return (state
-        .set('validating', false)
-        .set('errors', state.get('errors').push(...errorNames))
+    case VALIDATION_NO_ERRORS:
+    case VALIDATION_ERRORS:
+      return state.set(
+        'asyncValidators',
+        state.get('asyncValidators').map(val => asyncValidator(val, action))
       );
-    }
     default:
       return state;
   }
 };
 
+/**
+ * Form
+ */
+
+export const getFormData = (form) => form.get('fields').map(f => f.get('value'));
+
+export const validateValue = (value, validators, formVals) => {
+  const errors = [];
+
+  validators.forEach(({ name, params }) => {
+    // Confirm that the validator is recognized
+    invariant(
+      name in validationFunctions,
+      `${name} validator is not recognized in validators.js`
+    );
+
+    if (!validationFunctions[name](value, params, formVals)) {
+      errors.push(name);
+    }
+  });
+
+  return errors;
+}
+
+export const validateField = (f, formVals) => f.set(
+  'syncErrors',
+  List(validateValue(f.get('value'), f.get('syncValidators'), formVals))
+);
+
+export const validateForm = (form) => form.set(
+  'fields',
+  form.fields.map(f => validateField(f, getFormData(form)))
+);
+
+export const Form = Record({
+  fields: Map(),
+  submitting: false,
+});
 export const form = (state = new Form(), action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case ATTACH_TO_FORM:
-      return (state
-        .setIn(['fields', payload.name], field(undefined, action))
-        .validate()
-      );
+    case ATTACH_TO_FORM: {
+      state = state.setIn(['fields', payload.name], field(undefined, action));
+      state = validateForm(state);
+      return state;
+    }
     case DETACH_FROM_FORM:
       return state.removeIn(['fields', payload.name]);
     case TOUCH:
       return state.set('fields', state.get('fields').map(f => field(f, action)));
-    case CHANGE:
-      return (state
-        .set('fields', state.get('fields').map(f => f.setNeedsValidation(payload)))
-        .setIn(['fields', payload.name], field(state.getIn(['fields', payload.name]), action))
-        .validate()
+    case CHANGE: {
+      state = state.set(
+        'fields',
+        state.get('fields').map(f => fieldNeedsValidation(f, payload.name))
       );
+      state = state.setIn(
+        ['fields', payload.name],
+        field(state.getIn(['fields', payload.name]), action)
+      );
+      state = validateForm(state);
+      return state;
+    }
     case SUBMIT_REQUEST:
       return state.set('submitting', true);
     case SUBMIT_SUCCESS:
@@ -189,7 +252,8 @@ export const form = (state = new Form(), action) => {
       );
     case BLUR:
     case VALIDATION_REQUEST:
-    case RECEIVE_VALIDATION_ERRORS: {
+    case VALIDATION_NO_ERRORS:
+    case VALIDATION_ERRORS: {
       const newField = field(state.getIn(['fields', payload.name]), action);
       return state.setIn(['fields', payload.name], newField);
     }
@@ -197,6 +261,10 @@ export const form = (state = new Form(), action) => {
       return state;
   }
 };
+
+/**
+ * Forms
+ */
 
 export const forms = (state = new Map(), action) => {
   const { type, payload } = action;
@@ -216,7 +284,8 @@ export const forms = (state = new Map(), action) => {
     case SUBMIT_SUCCESS:
     case SUBMIT_FAILURE:
     case VALIDATION_REQUEST:
-    case RECEIVE_VALIDATION_ERRORS:
+    case VALIDATION_NO_ERRORS:
+    case VALIDATION_ERRORS:
       return state.set(payload.id, form(state.get(payload.id), action));
     default:
       return state;

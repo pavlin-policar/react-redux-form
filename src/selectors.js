@@ -12,46 +12,42 @@ export const getFormsDomain = () => (state) => state.get('forms');
 // Form selectors
 export const getForm = (id) => createSelector(
   getFormsDomain(),
-  forms => forms.get(id) || Map()
-);
-export const getFormProps = (id) => createSelector(
-  getForm(id),
-  form => (form || new Form()).toJS()
+  forms => forms.get(id)
 );
 export const getFormIsSubmitting = (id) => createSelector(
   getForm(id),
-  form => form.get('submitting') || false
+  form => form.get('submitting')
 );
 
 export const getFormFields = (id) => createSelector(
   getForm(id),
-  form => form.get('fields') || Map()
+  form => form.get('fields')
 );
 export const getFormValues = (id) => createSelector(
   getFormFields(id),
-  fields => fields.map(f => f.get('value')) || Map()
+  fields => fields.map(f => f.get('value'))
 );
 export const getFormErrors = (id) => createSelector(
   getFormFields(id),
-  fields => fields.map(f => f.get('errors')) || Map()
+  fields => fields.map(f => f.get('syncErrors'))
 );
 export const getFormIsValid = (id) => createSelector(
   getForm(id),
-  form => (form.isValid && form.isValid()) || false
+  form => (form.isValid && form.isValid())
 );
 export const getFormFieldNames = (id) => createSelector(
   getFormFields(id),
-  fields => fields.map(f => f.get('name')) || []
+  fields => fields.map(f => f.get('name'))
 );
 export const getFormTouchedFields = (id) => createSelector(
   getFormFields(id),
-  fields => fields.map(f => f.get('touched')) || Map()
+  fields => fields.map(f => f.get('touched'))
 );
 
 // Field selectors
 export const getField = (id, name) => createSelector(
   getForm(id),
-  form => form.getIn(['fields', name]) || new Field()
+  form => form.getIn(['fields', name])
 );
 export const getFieldValue = (id, name) => createSelector(
   getField(id, name),
@@ -61,6 +57,22 @@ export const getFieldTouched = (id, name) => createSelector(
   getField(id, name),
   field => field.get('touched')
 );
+export const getFieldSyncValidators = (id, name) => createSelector(
+  getField(id, name),
+  field => field.get('syncValidators')
+)
+export const getFieldSyncErrors = (id, name) => createSelector(
+  getField(id, name),
+  field => field.get('syncErrors')
+)
+export const getFieldAsyncValidators = (id, name) => createSelector(
+  getField(id, name),
+  field => field.get('asyncValidators')
+)
+export const getFieldAsyncErrors = (id, name) => createSelector(
+  getField(id, name),
+  field => field.get('asyncErrors')
+)
 
 
 export default getForm;
