@@ -25,13 +25,13 @@ export const SyncValidator = Record({
   params: [],
 });
 export const syncValidator = (state = new SyncValidator(), action) => {
-  const { type, payload } = state;
+  const { type } = action;
 
   switch (type) {
     default:
       return state;
   }
-}
+};
 
 /**
  * Parse the validation string passed down from props.
@@ -100,8 +100,10 @@ export const asyncValidator = (state = new AsyncValidator(), action) => {
     case VALIDATION_NO_ERRORS:
     case VALIDATION_ERRORS:
       return state.set('isValidating', false);
+    default:
+      return state;
   }
-}
+};
 
 /**
  * Field
@@ -161,8 +163,8 @@ export const field = (state = new Field(), action) => {
       }
       return state;
     case CHANGE: {
-      state = state.set('value', payload.value);
-      state = state.set('needsValidation', fieldNeedsValidation(state, action.name));
+      state = state.set('value', payload.value); // eslint-disable-line no-param-reassign
+      state = state.set('needsValidation', fieldNeedsValidation(state, action.name)); // eslint-disable-line no-param-reassign
       return state;
     }
     case SUBMIT_FAILURE:
@@ -201,7 +203,7 @@ export const validateValue = (value, validators, formVals) => {
   });
 
   return errors;
-}
+};
 
 export const validateField = (f, formVals) => f.set(
   'syncErrors',
@@ -222,8 +224,8 @@ export const form = (state = new Form(), action) => {
 
   switch (type) {
     case ATTACH_TO_FORM: {
-      state = state.setIn(['fields', payload.name], field(undefined, action));
-      state = validateForm(state);
+      state = state.setIn(['fields', payload.name], field(undefined, action)); // eslint-disable-line no-param-reassign
+      state = validateForm(state); // eslint-disable-line no-param-reassign
       return state;
     }
     case DETACH_FROM_FORM:
@@ -231,15 +233,15 @@ export const form = (state = new Form(), action) => {
     case TOUCH:
       return state.set('fields', state.get('fields').map(f => field(f, action)));
     case CHANGE: {
-      state = state.set(
+      state = state.set( // eslint-disable-line no-param-reassign
         'fields',
         state.get('fields').map(f => fieldNeedsValidation(f, payload.name))
       );
-      state = state.setIn(
+      state = state.setIn( // eslint-disable-line no-param-reassign
         ['fields', payload.name],
         field(state.getIn(['fields', payload.name]), action)
       );
-      state = validateForm(state);
+      state = validateForm(state); // eslint-disable-line no-param-reassign
       return state;
     }
     case SUBMIT_REQUEST:

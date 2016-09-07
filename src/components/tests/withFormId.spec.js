@@ -7,7 +7,7 @@ import withFormId from '../withFormId';
 
 describe('withFormId', () => {
   it('should take formId from the context and pass it to its child', () => {
-    const WrappedComponent = withFormId(<div />)
+    const WrappedComponent = withFormId(<div />);
     const renderedComponent = shallow(
       <WrappedComponent />,
       { context: { form: { id: 'form' } } }

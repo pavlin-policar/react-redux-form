@@ -34,7 +34,7 @@ describe('Form reducers', () => {
     describe('attaching to form', () => {
       it('should set its name');
       it('should set its initial value when it is passed', () => {
-        let state = field(state, actions.attachToForm({ name: 'f', initialValue: 'val' }));
+        const state = field(state, actions.attachToForm({ name: 'f', initialValue: 'val' }));
         expect(state.get('value')).toBe('val');
       });
       it('should parse and set its validation string for sync validations');
@@ -134,7 +134,7 @@ describe('Form reducers', () => {
         sinon.stub(validationFunctions, 'length').returns(false);
         sinon.stub(validationFunctions, 'alpha').returns(false);
         sinon.stub(validationFunctions, 'required').returns(true);
-      })
+      });
 
       it('should validate a value when it doesn\'t have to deal with other fields', () => {
         const validators = List([
@@ -144,9 +144,8 @@ describe('Form reducers', () => {
         ]);
         const otherValues = new Map();
 
-        expect(validateValue('123', validators, otherValues)).toEqual(['length', 'alpha'])
+        expect(validateValue('123', validators, otherValues)).toEqual(['length', 'alpha']);
       });
-
     });
   });
 });

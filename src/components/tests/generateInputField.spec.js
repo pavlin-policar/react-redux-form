@@ -34,11 +34,11 @@ describe('generateInputComponent', () => {
 
   describe('react lifecycle hooks', () => {
     it('shuld attach itself to its form when mounting and has a name', () => {
-      const renderedComponent = mountInput(<Component name="text" />);
+      mountInput(<Component name="text" />);
       expect(context.form.attach).toHaveBeenCalled();
     });
     it('shouldn\'t attach itself to its form if it doesn\'t have a name', () => {
-      const renderedComponent = mountInput(<Component />);
+      mountInput(<Component />);
       expect(context.form.attach).toNotHaveBeenCalled();
     });
     it('should detach from its form when unmounting', () => {
@@ -49,8 +49,8 @@ describe('generateInputComponent', () => {
   });
 
   it('should generate an input type component', () => {
-    const Component = generateInputComponent('text');
-    const renderedComponent = shallowInput(<Component />);
+    const TextComponent = generateInputComponent('text');
+    const renderedComponent = shallowInput(<TextComponent />);
     expect(renderedComponent.find('input').length).toBe(1);
   });
 

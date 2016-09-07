@@ -131,9 +131,9 @@ describe('form state', () => {
 
     describe('touched', () => {
       it('should have its touched flag to false by default', () => {
-      expect(select.getFieldTouched('form', 'field1')(s(state))).toBe(false);
-      expect(select.getFieldTouched('form', 'field2')(s(state))).toBe(false);
-      expect(select.getFieldTouched('form', 'field3')(s(state))).toBe(false);
+        expect(select.getFieldTouched('form', 'field1')(s(state))).toBe(false);
+        expect(select.getFieldTouched('form', 'field2')(s(state))).toBe(false);
+        expect(select.getFieldTouched('form', 'field3')(s(state))).toBe(false);
       });
 
       it('should set its touched flag to true when being blurred out for the first time', () => {
@@ -229,9 +229,9 @@ describe('form state', () => {
 
   describe('asynchronous validate', () => {
     let state;
-    let async1 = expect.createSpy();
-    let async2 = expect.createSpy();
-    let async3 = expect.createSpy();
+    const async1 = expect.createSpy();
+    const async2 = expect.createSpy();
+    const async3 = expect.createSpy();
     beforeEach(() => {
       // Prepare a form with id `form` containing 3 fields
       state = forms(emptyFormState, {});

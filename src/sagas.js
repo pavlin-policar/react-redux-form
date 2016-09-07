@@ -27,12 +27,9 @@ export function* validate({ payload, meta }) {
 
   // Signal that the async action has completed with appropriate status
   if (responseStatus.success) {
-    const data = responseStatus.success.payload;
-    console.log(noAsyncErrors({ id, name, validationName }));
     yield put(noAsyncErrors({ id, name, validationName }));
   } else {
-    console.log(noAsyncErrors({ id, name, validationName }));
-    yield put(submitFailed({ id, name, validationName }));
+    yield put(receiveAsyncErrors({ id, name, validationName }));
   }
 }
 
@@ -43,7 +40,7 @@ function* validateWatcher() {
 /**
  * SUBMIT
  */
-export function* submit({ payload, meta}) {
+export function* submit({ payload, meta }) {
   const { successActionType, failureActionType } = meta;
   const { id } = payload;
 

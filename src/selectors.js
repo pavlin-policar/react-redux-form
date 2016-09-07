@@ -1,7 +1,4 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
-
-import { Form, Field } from './reducer';
 
 
 /**
@@ -60,19 +57,19 @@ export const getFieldTouched = (id, name) => createSelector(
 export const getFieldSyncValidators = (id, name) => createSelector(
   getField(id, name),
   field => field.get('syncValidators')
-)
+);
 export const getFieldSyncErrors = (id, name) => createSelector(
   getField(id, name),
   field => field.get('syncErrors')
-)
+);
 export const getFieldAsyncValidators = (id, name) => createSelector(
   getField(id, name),
   field => field.get('asyncValidators')
-)
+);
 export const getFieldAsyncErrors = (id, name) => createSelector(
   getField(id, name),
   field => field.get('asyncErrors')
-)
+);
 
 
 export default getForm;
