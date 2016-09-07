@@ -36,7 +36,7 @@ export const getFormErrors = (id) => createSelector(
 );
 export const getFormIsValid = (id) => createSelector(
   getFormErrors(id),
-  errors => errors.size === 0
+  errors => errors.every(list => list.isEmpty())
 );
 export const getFormFieldNames = (id) => createSelector(
   getFormFields(id),
