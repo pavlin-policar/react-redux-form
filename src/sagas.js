@@ -15,7 +15,7 @@ import {
  */
 export function* validate({ payload, meta }) {
   const { successActionType, failureActionType } = meta;
-  const { id, name, validationName, action } = payload;
+  const { id, name, validator, action } = payload;
 
   // Dispatch the initial form request action
   yield put(action);
@@ -27,9 +27,9 @@ export function* validate({ payload, meta }) {
 
   // Signal that the async action has completed with appropriate status
   if (responseStatus.success) {
-    yield put(noAsyncErrors({ id, name, validationName }));
+    yield put(noAsyncErrors({ id, name, validator }));
   } else {
-    yield put(receiveAsyncErrors({ id, name, validationName }));
+    yield put(receiveAsyncErrors({ id, name, validator }));
   }
 }
 

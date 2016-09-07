@@ -97,7 +97,8 @@
             "Record",
             "OrderedMap",
             "Router",
-            "Schema"
+            "Schema",
+            "Set"
           ]
         }
       ],

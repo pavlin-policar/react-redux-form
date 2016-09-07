@@ -12,7 +12,7 @@ describe('form sagas', () => {
   };
   const id = 'form';
   const name = 'field';
-  const validationName = 'someAsyncValidation';
+  const validator = 'someAsyncValidation';
 
   describe('validation saga', () => {
     let generator;
@@ -20,7 +20,7 @@ describe('form sagas', () => {
       expect.spyOn(actions, 'noAsyncErrors').andCallThrough();
       expect.spyOn(actions, 'receiveAsyncErrors').andCallThrough();
       generator = validate({
-        payload: { id, name, validationName, action: requestAction },
+        payload: { id, name, validator, action: requestAction },
         meta: {
           successActionType: 'ACTION_SUCCESS',
           failureActionType: 'ACTION_FAILURE',
@@ -33,7 +33,7 @@ describe('form sagas', () => {
     });
 
     // The data required in the response action for validations
-    const requiredAction = { id, name, validationName };
+    const requiredAction = { id, name, validator };
 
     it('should handle a failed async validation', () => {
       expect(generator.next().value).toEqual(put(requestAction));

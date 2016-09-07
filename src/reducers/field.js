@@ -1,4 +1,4 @@
-import { Record, List } from 'immutable';
+import { Record, List, Set } from 'immutable';
 import { trim } from 'lodash';
 
 import {
@@ -34,10 +34,10 @@ export const Field = Record({
   name: '',
   value: '',
   syncValidators: List(),
-  syncErrors: List(),
+  syncErrors: Set(),
   asyncValidators: List(),
-  asyncErrors: List(),
-  serverErrors: List(),
+  asyncErrors: Set(),
+  serverErrors: Set(),
   needsValidation: true,
   touched: false,
 });
@@ -88,12 +88,28 @@ export const field = (state = new Field(), action) => {
     case SUBMIT_FAILURE:
       return state.set('syncErrors', List(payload.errors[state.get('name')]));
     case VALIDATION_REQUEST:
-    case VALIDATION_NO_ERRORS:
-    case VALIDATION_ERRORS:
-      return state.set(
+    case VALIDATION_NO_ERRORS: {
+      state = state.set( // eslint-disable-line no-param-reassign
         'asyncValidators',
         state.get('asyncValidators').map(val => asyncValidator(val, action))
       );
+      state = state.set( // eslint-disable-line no-param-reassign
+        'asyncErrors',
+        state.get('asyncErrors').remove(payload.validator)
+      );
+      return state;
+    }
+    case VALIDATION_ERRORS: {
+      state = state.set( // eslint-disable-line no-param-reassign
+        'asyncValidators',
+        state.get('asyncValidators').map(val => asyncValidator(val, action))
+      );
+      state = state.set( // eslint-disable-line no-param-reassign
+        'asyncErrors',
+        state.get('asyncErrors').add(payload.validator)
+      );
+      return state;
+    }
     default:
       return state;
   }

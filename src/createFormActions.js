@@ -48,13 +48,13 @@ export const createFormSubmitAction = (requestAction, types) => {
 export const createFormValidationAction = (requestAction, types) => {
   const [successActionType, failureActionType] = types;
 
-  return (id, name, validationName, data) => ({
+  return (id, name, validator, data) => ({
     type: VALIDATION_REQUEST,
     meta: { successActionType, failureActionType },
     payload: {
       id,
       name,
-      validationName,
+      validator,
       action: requestAction(data),
     },
   });

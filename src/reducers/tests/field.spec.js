@@ -1,4 +1,5 @@
 import expect from 'expect';
+import { Set } from 'immutable';
 
 import { field } from '../field';
 import * as actions from '../../actions';
@@ -71,6 +72,45 @@ describe('the field reducer', () => {
       }));
       field(state, actions.receiveAsyncErrors({}));
       expect(validatorReducer.asyncValidator).toHaveBeenCalled();
+    });
+
+    it('should add the failed async validation to the set of async errors', () => {
+      let state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { id1: i => i, id2: i => i },
+      }));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id1' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1']));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id2' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1', 'id2']));
+    });
+
+    it('should remove the async validation error when is succeeds', () => {
+      let state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { id1: i => i, id2: i => i },
+      }));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id1' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1']));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id2' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1', 'id2']));
+      // Begin test
+      state = field(state, actions.noAsyncErrors({ validator: 'id1' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id2']));
+    });
+
+    it('should remove the async validation error when is requesting again', () => {
+      let state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { id1: i => i, id2: i => i },
+      }));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id1' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1']));
+      state = field(state, actions.receiveAsyncErrors({ validator: 'id2' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id1', 'id2']));
+      // Begin test
+      state = field(state, actions.requestAsyncValidation({ validator: 'id1' }));
+      expect(state.get('asyncErrors')).toEqual(Set(['id2']));
     });
   });
 });

@@ -119,8 +119,8 @@ export function generateInputComponent(type, { validate = '', className } = {}) 
 
     triggerAsyncValidation() {
       const { validateAsync, formId, name, value, dispatch } = this.props;
-      forEach(validateAsync, (validateActionRequest, validationName) => {
-        const action = validateActionRequest(formId, name, validationName, { [name]: value });
+      forEach(validateAsync, (validateActionRequest, validator) => {
+        const action = validateActionRequest(formId, name, validator, { [name]: value });
         // The action may be noop, if the components decide there is no need to
         // validate
         if (action && action.type) dispatch(action);
