@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
-import { Form, Field } from './reducer';
+import { Form } from './reducers/form';
+import { Field } from './reducers/field';
 
 
 /**

@@ -3,7 +3,9 @@ import { Map, List } from 'immutable';
 
 import * as actions from '../actions';
 import * as select from '../selectors';
-import forms, { Field, SyncValidator, AsyncValidator } from '../reducer';
+import forms from '../reducer';
+import { Field } from '../reducers/field';
+import { SyncValidator, AsyncValidator } from '../reducers/validators';
 
 
 // Simulate the application state
