@@ -1,6 +1,6 @@
 {
   "name": "@policar/react-redux-form",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "scripts": {
     "prebuild": "npm run clean && npm run test",
     "build": "babel src --out-dir lib --ignore tests",
@@ -114,7 +114,7 @@
     }
   },
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "babel-runtime": "^6.11.6",
     "classnames": "^2.2.5",
