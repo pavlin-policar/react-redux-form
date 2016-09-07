@@ -15,10 +15,10 @@ import {
  */
 export function* validate({ payload, meta }) {
   const { successActionType, failureActionType } = meta;
-  const { id, name, validationName } = payload;
+  const { id, name, validationName, action } = payload;
 
   // Dispatch the initial form request action
-  yield put(payload.action);
+  yield put(action);
   // What response did we get?
   const responseStatus = yield race({
     success: take(successActionType),
@@ -42,10 +42,10 @@ function* validateWatcher() {
  */
 export function* submit({ payload, meta }) {
   const { successActionType, failureActionType } = meta;
-  const { id } = payload;
+  const { id, action } = payload;
 
   // Dispatch the initial form request action
-  yield put(payload.action);
+  yield put(action);
   // What response did we get?
   const responseStatus = yield race({
     success: take(successActionType),

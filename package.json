@@ -12,6 +12,7 @@
     "test:single": "cross-env NODE_ENV=test mocha --compilers js:babel-register src/tests/.setup.js",
     "test:watch": "npm run test -- --watch"
   },
+  "pre-commit": "lint",
   "author": "Pavlin Poličar <pavlin.g.p@gmail.com>",
   "keywords": [
     "react",
