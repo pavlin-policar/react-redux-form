@@ -218,8 +218,9 @@ export const validateForm = (form) => form.set(
 export const Form = Record({
   fields: Map(),
   submitting: false,
+  registered: false,
 });
-export const form = (state = new Form(), action) => {
+export const form = (state = new Form({ registered: true }), action) => {
   const { type, payload } = action;
 
   switch (type) {
