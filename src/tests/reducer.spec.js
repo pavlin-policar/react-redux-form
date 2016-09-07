@@ -71,6 +71,17 @@ describe('Form reducers', () => {
   });
 
   describe('the form reducer', () => {
+    describe('registering a form', () => {
+      it('should have an empty id by default', () => {
+        const state = form(undefined, {});
+        expect(state.get('id')).toBe('');
+      });
+      it('should set its id', () => {
+        const state = form(undefined, actions.registerForm('form1'));
+        expect(state.get('id')).toBe('form1');
+      });
+    });
+
     describe('attaching a field to form', () => {
       it('should create a field in its fields with the field name');
       it('should validate the form state after attaching a field');

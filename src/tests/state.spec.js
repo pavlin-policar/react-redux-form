@@ -21,9 +21,9 @@ describe('form state', () => {
       state = forms(state, actions.registerForm('form1'));
       state = forms(state, actions.registerForm('form2'));
       state = forms(state, actions.registerForm('form3'));
-      expect(select.getForm('form1')(s(state)).get('registered')).toBe(true);
-      expect(select.getForm('form2')(s(state)).get('registered')).toBe(true);
-      expect(select.getForm('form3')(s(state)).get('registered')).toBe(true);
+      expect(select.getForm('form1')(s(state)).get('id')).toBe('form1');
+      expect(select.getForm('form2')(s(state)).get('id')).toBe('form2');
+      expect(select.getForm('form3')(s(state)).get('id')).toBe('form3');
     });
 
     it('should unregister a form', () => {
@@ -32,9 +32,9 @@ describe('form state', () => {
       state = forms(state, actions.registerForm('form3'));
 
       state = forms(state, actions.unregisterForm('form2'));
-      expect(select.getForm('form1')(s(state)).get('registered')).toBe(true);
-      expect(select.getForm('form2')(s(state)).get('registered')).toBe(false);
-      expect(select.getForm('form3')(s(state)).get('registered')).toBe(true);
+      expect(select.getForm('form1')(s(state)).get('id')).toBe('form1');
+      expect(select.getForm('form2')(s(state)).get('id')).toBe('');
+      expect(select.getForm('form3')(s(state)).get('id')).toBe('form3');
     });
   });
 

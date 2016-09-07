@@ -216,14 +216,16 @@ export const validateForm = (form) => form.set(
 );
 
 export const Form = Record({
+  id: '',
   fields: Map(),
   submitting: false,
-  registered: false,
 });
-export const form = (state = new Form({ registered: true }), action) => {
+export const form = (state = new Form(), action) => {
   const { type, payload } = action;
 
   switch (type) {
+    case REGISTER_FORM:
+      return state.set('id', payload);
     case ATTACH_TO_FORM: {
       state = state.setIn(['fields', payload.name], field(undefined, action)); // eslint-disable-line no-param-reassign
       state = validateForm(state); // eslint-disable-line no-param-reassign
