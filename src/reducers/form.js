@@ -1,4 +1,4 @@
-import { Record, List, Map } from 'immutable';
+import { Record, Set, Map } from 'immutable';
 import invariant from 'invariant';
 
 import {
@@ -45,7 +45,7 @@ export const validateValue = (value, validators, formVals) => {
 
 export const validateField = (f, formVals) => f.set(
   'syncErrors',
-  List(validateValue(f.get('value'), f.get('syncValidators'), formVals))
+  Set(validateValue(f.get('value'), f.get('syncValidators'), formVals.toJS()))
 );
 
 export const validateForm = (form) => form.set(

@@ -1,5 +1,5 @@
 import expect from 'expect';
-import { Map, List } from 'immutable';
+import { Map, List, Set } from 'immutable';
 
 import * as actions from '../actions';
 import * as select from '../selectors';
@@ -211,10 +211,10 @@ describe('form state', () => {
       state = forms(emptyFormState, {});
 
       state = forms(state, actions.attachToForm({ id: 'form', name: 'field1', validationString: 'required' }));
-      expect(select.getFieldSyncErrors('form', 'field1')(s(state))).toEqual(List(['required']));
+      expect(select.getFieldSyncErrors('form', 'field1')(s(state))).toEqual(Set(['required']));
 
       state = forms(state, actions.attachToForm({ id: 'form', name: 'field2', validationString: 'length:1,2' }));
-      expect(select.getFieldSyncErrors('form', 'field2')(s(state))).toEqual(List(['length']));
+      expect(select.getFieldSyncErrors('form', 'field2')(s(state))).toEqual(Set(['length']));
     });
 
     it('should validate the entire form when a value changes', () => {
@@ -222,9 +222,9 @@ describe('form state', () => {
       expect(
         select.getFormErrors('form')(s(state))
       ).toEqual(Map({
-        field1: List(['required']),
-        field2: List(['required']),
-        field3: List(['length']) }
+        field1: Set(['required']),
+        field2: Set(['required']),
+        field3: Set(['length']) }
       ));
     });
   });

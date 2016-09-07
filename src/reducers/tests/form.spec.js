@@ -1,9 +1,10 @@
 import expect from 'expect';
 import { Map } from 'immutable';
 
-import { form, getFormData } from '../form';
+import { form, getFormData, validateValue } from '../form';
 import * as actions from '../../actions';
 import * as fieldReducer from '../field';
+import * as validationFunctions from '../../validators';
 
 
 describe('the form reducer', () => {
@@ -68,6 +69,44 @@ describe('the form reducer', () => {
         state = form(state, actions.attachToForm({ name: 'f3', initialValue: 'val3' }));
 
         expect(getFormData(state)).toEqual(Map({ f1: 'val1', f2: 'val2', f3: 'val3' }));
+      });
+    });
+
+    describe('validateValue', () => {
+      afterEach(() => {
+        expect.restoreSpies();
+      });
+
+      it('should return an empty array if there are no errors', () => {
+        expect.spyOn(validationFunctions, 'length').andReturn(true);
+        expect.spyOn(validationFunctions, 'alpha').andReturn(true);
+        const validators = [
+          { name: 'length', params: ['3', '6'] },
+          { name: 'alpha', params: [] },
+        ];
+        const vals = {};
+        expect(validateValue('12', validators, vals)).toEqual([]);
+      });
+
+      it('should return an array of errors when there are errors', () => {
+        expect.spyOn(validationFunctions, 'length').andReturn(false);
+        expect.spyOn(validationFunctions, 'alpha').andReturn(false);
+        const validators = [
+          { name: 'length', params: ['3', '6'] },
+          { name: 'alpha', params: [] },
+        ];
+        const vals = {};
+        expect(validateValue('12', validators, vals)).toEqual(['length', 'alpha']);
+      });
+
+      it('should call the validators with other form values', () => {
+        expect.spyOn(validationFunctions, 'length').andReturn(false);
+        const validators = [
+          { name: 'length', params: ['3', '6'] },
+        ];
+        const vals = { key1: 'val1', key2: 'val2' };
+        validateValue('12', validators, vals);
+        expect(validationFunctions.length).toHaveBeenCalledWith('12', validators[0].params, vals);
       });
     });
   });
