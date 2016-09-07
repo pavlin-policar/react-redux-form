@@ -1,9 +1,9 @@
 import expect from 'expect';
 import { Map } from 'immutable';
 
-import * as actions from '../actions';
-import { forms } from '../reducer';
-import { form, Form, getFormData } from '../reducers/form';
+import * as actions from '../../actions';
+import { forms } from '../forms';
+import { form, Form, getFormData } from '../form';
 
 
 describe('Form reducers', () => {
