@@ -44,7 +44,6 @@ describe('form sagas', () => {
         })
       );
       generator.next({ failure: { payload: { error: true } } });
-      console.log(actions.receiveAsyncErrors.calls[0]);
       expect(actions.receiveAsyncErrors).toHaveBeenCalledWith(requiredAction);
       expect(actions.noAsyncErrors).toNotHaveBeenCalled();
     });

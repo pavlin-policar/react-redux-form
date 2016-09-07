@@ -4,12 +4,12 @@ import sinon from 'sinon';
 
 import * as validationFunctions from '../validators';
 import {
-  syncValidator,
+  // syncValidator,
   SyncValidator,
-  asyncValidator,
-  AsyncValidator,
+  // asyncValidator,
+  // AsyncValidator,
   field,
-  Field,
+  // Field,
   form,
   Form,
   forms,
