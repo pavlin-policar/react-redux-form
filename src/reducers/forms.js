@@ -7,6 +7,7 @@ import {
   ATTACH_TO_FORM,
   DETACH_FROM_FORM,
   CHANGE,
+  FOCUS,
   BLUR,
   TOUCH,
   SUBMIT_REQUEST,
@@ -34,6 +35,7 @@ export const forms = (state = new Map(), action) => {
     case ATTACH_TO_FORM:
     case DETACH_FROM_FORM:
     case CHANGE:
+    case FOCUS:
     case BLUR:
     case TOUCH:
     case SUBMIT_REQUEST:

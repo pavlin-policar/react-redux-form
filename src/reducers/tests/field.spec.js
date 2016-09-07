@@ -2,6 +2,7 @@ import expect from 'expect';
 
 import { field } from '../field';
 import * as actions from '../../actions';
+import * as validatorReducer from '../validators';
 
 
 describe('the field reducer', () => {
@@ -40,6 +41,36 @@ describe('the field reducer', () => {
   });
 
   describe('asynchronous validation', () => {
-    it('should propagate the action to the `asyncValidators` reducer');
+    beforeEach(() => {
+      expect.spyOn(validatorReducer, 'asyncValidator');
+    });
+    afterEach(() => {
+      expect.restoreSpies();
+    });
+
+    it('should propagate `requestAsyncValidation` to the `asyncValidators` reducer', () => {
+      const state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { identity: i => i },
+      }));
+      field(state, actions.requestAsyncValidation({}));
+      expect(validatorReducer.asyncValidator).toHaveBeenCalled();
+    });
+    it('should propagate `noAsyncErrors` to the `asyncValidators` reducer', () => {
+      const state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { identity: i => i },
+      }));
+      field(state, actions.noAsyncErrors({}));
+      expect(validatorReducer.asyncValidator).toHaveBeenCalled();
+    });
+    it('should propagate `receiveAsyncErrors` to the `asyncValidators` reducer', () => {
+      const state = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncValidators: { identity: i => i },
+      }));
+      field(state, actions.receiveAsyncErrors({}));
+      expect(validatorReducer.asyncValidator).toHaveBeenCalled();
+    });
   });
 });
