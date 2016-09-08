@@ -31,14 +31,48 @@ describe('the field reducer', () => {
   describe('changing', () => {
     it('should change its `value`');
     it('should set its `needsValidation` flag');
+    it('should clear its `asyncErrors`', () => {
+      const initialState = field(undefined, actions.attachToForm({
+        name: 'field',
+        asyncErrors: Set(['error1', 'error2']),
+      }));
+      const state = field(initialState, actions.change({}));
+      expect(state.get('asyncErrors')).toEqual(Set());
+    });
+    it('should clear its `serverErrors`', () => {
+      const initialState = field(undefined, actions.attachToForm({
+        name: 'field',
+        serverErrors: Set(['error1', 'error2']),
+      }));
+      const state = field(initialState, actions.change({}));
+      expect(state.get('serverErrors')).toEqual(Set());
+    });
   });
 
   describe('form submit attempt', () => {
-    it('should clear any previous server submit errors');
+    it('should clear any previous server submit errors', () => {
+      const initialState = field(undefined, actions.attachToForm({
+        name: 'field',
+        serverErrors: Set(['error1', 'error2']),
+      }));
+      const state = field(initialState, actions.submit());
+      expect(state.get('serverErrors')).toEqual(Set());
+    });
   });
 
   describe('form submit failure', () => {
-    it('should merge any form errors from the server into its errors');
+    it('should merge any form errors from the server into its errors', () => {
+      const initialState = field(undefined, actions.attachToForm({
+        name: 'field',
+      }));
+      const state = field(initialState, actions.submitFailed({
+        errors: {
+          field: ['error1', 'error2'],
+          otherField: ['error3', 'error4'],
+        },
+      }));
+      expect(state.get('serverErrors')).toEqual(Set(['error1', 'error2']));
+    });
   });
 
   describe('asynchronous validation', () => {

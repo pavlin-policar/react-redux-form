@@ -32,7 +32,9 @@ export const getFormValues = (id) => createSelector(
 );
 export const getFormErrors = (id) => createSelector(
   getFormFields(id),
-  fields => fields.map(f => f.get('syncErrors').merge(f.get('asyncErrors')))
+  fields => fields.map(f =>
+    f.get('syncErrors').merge(f.get('asyncErrors').merge(f.get('serverErrors')))
+  ) || Map()
 );
 export const getFormIsValid = (id) => createSelector(
   getFormErrors(id),

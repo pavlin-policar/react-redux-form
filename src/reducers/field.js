@@ -11,6 +11,7 @@ import {
   BLUR,
   TOUCH,
   CHANGE,
+  SUBMIT_REQUEST,
   SUBMIT_FAILURE,
   VALIDATION_REQUEST,
   VALIDATION_NO_ERRORS,
@@ -85,10 +86,14 @@ export const field = (state = new Field(), action) => {
     case CHANGE: {
       state = state.set('value', payload.value);
       state = fieldNeedsValidation(state, payload.name, payload.value);
+      state = state.set('asyncErrors', state.get('asyncErrors').clear());
+      state = state.set('serverErrors', state.get('serverErrors').clear());
       return state;
     }
+    case SUBMIT_REQUEST:
+      return state.set('serverErrors', state.get('serverErrors').clear());
     case SUBMIT_FAILURE:
-      return state.set('syncErrors', List(payload.errors[state.get('name')]));
+      return state.set('serverErrors', Set(payload.errors[state.get('name')]));
     case VALIDATION_REQUEST:
       state = state.set(
         'asyncValidators',

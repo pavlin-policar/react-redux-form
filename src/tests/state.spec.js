@@ -112,9 +112,9 @@ describe('form state', () => {
           },
         }));
         expect(select.getFormErrors('form')(s(state))).toEqual(new Map({
-          field1: new List(['validation1', 'validation2']),
-          field2: new List(['validation3']),
-          field3: new List(),
+          field1: Set(['validation1', 'validation2']),
+          field2: Set(['validation3']),
+          field3: Set(),
         }));
       });
     });
