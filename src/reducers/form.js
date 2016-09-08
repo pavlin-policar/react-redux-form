@@ -25,6 +25,7 @@ import { field, fieldNeedsValidation } from './field';
 
 export const getFormData = (form) => form.get('fields').map(f => f.get('value'));
 
+/* eslint-disable no-param-reassign */
 export const validateValue = (value, validators, formVals) => {
   const errors = [];
 
@@ -65,8 +66,8 @@ export const form = (state = new Form(), action) => {
     case REGISTER_FORM:
       return state.set('id', payload);
     case ATTACH_TO_FORM: {
-      state = state.setIn(['fields', payload.name], field(undefined, action)); // eslint-disable-line no-param-reassign
-      state = validateForm(state); // eslint-disable-line no-param-reassign
+      state = state.setIn(['fields', payload.name], field(undefined, action));
+      state = validateForm(state);
       return state;
     }
     case DETACH_FROM_FORM:
@@ -74,25 +75,25 @@ export const form = (state = new Form(), action) => {
     case TOUCH:
       return state.set('fields', state.get('fields').map(f => field(f, action)));
     case CHANGE: {
-      state = state.set( // eslint-disable-line no-param-reassign
+      state = state.set(
         'fields',
         state.get('fields').map(f => fieldNeedsValidation(f, payload.name, payload.value))
       );
-      state = state.setIn( // eslint-disable-line no-param-reassign
+      state = state.setIn(
         ['fields', payload.name],
         field(state.getIn(['fields', payload.name]), action)
       );
-      state = validateForm(state); // eslint-disable-line no-param-reassign
+      state = validateForm(state);
       return state;
     }
     case SUBMIT_REQUEST:
       return state.set('submitting', true);
     case SUBMIT_SUCCESS:
-    case SUBMIT_FAILURE:
-      return (state
-        .set('submitting', false)
-        .set('fields', state.get('fields').map(f => field(f, action)))
-      );
+    case SUBMIT_FAILURE: {
+      state = state.set('submitting', false);
+      state = state.set('fields', state.get('fields').map(f => field(f, action)));
+      return state;
+    }
     case BLUR:
     case VALIDATION_REQUEST:
     case VALIDATION_NO_ERRORS:

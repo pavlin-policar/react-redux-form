@@ -78,14 +78,9 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
 
     handleSubmit = (submitFunction, callbacks = []) => (e) => {
       e.preventDefault();
-      const {
-        fields,
-        isValid,
-        dispatch,
-        values,
-      } = this.props;
-      const fieldNames = fields.map(f => f.get('name')).toList();
+      const { fields, isValid, dispatch, values } = this.props;
       const [onSubmitSuccess, onSubmitFailure] = callbacks;
+      const fieldNames = fields.map(f => f.get('name')).toList();
       // Touch all the fields
       this.props.touch({ id, fields: fieldNames });
 
