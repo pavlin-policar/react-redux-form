@@ -22,11 +22,12 @@ import {
  * Field
  */
 
-export const fieldNeedsValidation = (field, changedFieldName) => field.set(
+export const fieldNeedsValidation = (field, name, value) => field.set(
   'needsValidation',
-  changedFieldName === field.name ||
+  (field.get('needsValidation')) ||
+  (name === field.get('name') && value !== field.get('value')) ||
   field.get('syncValidators').map(
-    validator => validator.get('params').some(param => param === changedFieldName)
+    validator => validator.get('params').some(param => param === name)
   ).some(req => req)
 );
 
@@ -82,12 +83,24 @@ export const field = (state = new Field(), action) => {
       return state;
     case CHANGE: {
       state = state.set('value', payload.value); // eslint-disable-line no-param-reassign
-      state = state.set('needsValidation', fieldNeedsValidation(state, action.name)); // eslint-disable-line no-param-reassign
+      state = fieldNeedsValidation(state, payload.name, payload.value); // eslint-disable-line no-param-reassign
       return state;
     }
     case SUBMIT_FAILURE:
       return state.set('syncErrors', List(payload.errors[state.get('name')]));
     case VALIDATION_REQUEST:
+      state = state.set( // eslint-disable-line no-param-reassign
+        'asyncValidators',
+        state.get('asyncValidators').map(val => asyncValidator(val, action))
+      );
+      state = state.set( // eslint-disable-line no-param-reassign
+        'asyncErrors',
+        state.get('asyncErrors').remove(payload.validator)
+      );
+      // We've requested the errors, so this doesn't need validation again until
+      // the value changes.
+      state = state.set('needsValidation', false); // eslint-disable-line no-param-reassign
+      return state;
     case VALIDATION_NO_ERRORS: {
       state = state.set( // eslint-disable-line no-param-reassign
         'asyncValidators',

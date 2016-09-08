@@ -24,7 +24,7 @@ export const getFormIsSubmitting = (id) => createSelector(
 );
 export const getFormFields = (id) => createSelector(
   getForm(id),
-  form => form.get('fields')
+  form => form.get('fields') || Map()
 );
 export const getFormValues = (id) => createSelector(
   getFormFields(id),
@@ -63,6 +63,10 @@ export const getFieldTouched = (id, name) => createSelector(
   getField(id, name),
   field => field.get('touched')
 );
+export const getFieldNeedsValidation = (id, name) => createSelector(
+  getField(id, name),
+  field => field.get('needsValidation')
+);
 export const getFieldSyncValidators = (id, name) => createSelector(
   getField(id, name),
   field => field.get('syncValidators')
@@ -70,6 +74,10 @@ export const getFieldSyncValidators = (id, name) => createSelector(
 export const getFieldSyncErrors = (id, name) => createSelector(
   getField(id, name),
   field => field.get('syncErrors')
+);
+export const getFieldHasSyncErrors = (id, name) => createSelector(
+  getFieldSyncErrors(id, name),
+  errors => errors.size !== 0
 );
 export const getFieldAsyncValidators = (id, name) => createSelector(
   getField(id, name),

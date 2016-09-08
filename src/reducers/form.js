@@ -76,7 +76,7 @@ export const form = (state = new Form(), action) => {
     case CHANGE: {
       state = state.set( // eslint-disable-line no-param-reassign
         'fields',
-        state.get('fields').map(f => fieldNeedsValidation(f, payload.name))
+        state.get('fields').map(f => fieldNeedsValidation(f, payload.name, payload.value))
       );
       state = state.setIn( // eslint-disable-line no-param-reassign
         ['fields', payload.name],

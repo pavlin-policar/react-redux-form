@@ -17,8 +17,7 @@ import {
   getFormValues,
   getFormErrors,
   getFormIsValid,
-  getFormFieldNames,
-  getFormTouchedFields,
+  getFormFields,
   getFormIsSubmitting,
 } from './selectors';
 
@@ -33,8 +32,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
       values: React.PropTypes.object.isRequired,
       errors: React.PropTypes.object.isRequired,
       isValid: React.PropTypes.bool.isRequired,
-      fieldNames: React.PropTypes.object,
-      fieldsTouched: React.PropTypes.object,
+      fields: React.PropTypes.object.isRequired,
       // Dispatch methods
       registerForm: React.PropTypes.func.isRequired,
       unregisterForm: React.PropTypes.func.isRequired,
@@ -66,7 +64,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
         this.props.values !== nextProps.values ||
         this.props.errors !== nextProps.errors ||
         this.props.isValid !== nextProps.isValid ||
-        this.props.fieldsTouched !== nextProps.fieldsTouched
+        this.props.fields !== nextProps.fields
       );
     }
 
@@ -81,13 +79,14 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
     handleSubmit = (submitFunction) => (e) => {
       e.preventDefault();
       const {
-        fieldNames: fields,
+        fields,
         isValid,
         dispatch,
         values,
       } = this.props;
+      const fieldNames = fields.map(f => f.get('name')).toList();
       // Touch all the fields
-      this.props.touch({ id, fields });
+      this.props.touch({ id, fields: fieldNames });
 
       if (isValid) {
         dispatch(submitFunction(id, { values }));
@@ -130,8 +129,7 @@ const createForm = (options) => (FormComponent) => {
     values: getFormValues(id)(state),
     errors: getFormErrors(id)(state),
     isValid: getFormIsValid(id)(state),
-    fieldNames: getFormFieldNames(id)(state),
-    fieldsTouched: getFormTouchedFields(id)(state),
+    fields: getFormFields(id)(state),
   });
   const mapDispatchToProps = (dispatch) => ({
     registerForm: bindActionCreators(registerForm, dispatch),

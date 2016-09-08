@@ -162,13 +162,17 @@ describe('generateInputComponent', () => {
   });
 
   describe('asynchronous validation', () => {
-    it('should trigger async validation on blur by default', () => {
+    it('should trigger async validation on blur the first time after it is changed', () => {
       const blurSpy = expect.createSpy();
       const validator1 = expect.createSpy();
       const validator2 = expect.createSpy();
       const renderedComponent = shallowInput(
         <Component validateAsync={{ validator1, validator2 }} blur={blurSpy} />
       );
+      expect.spyOn(
+        renderedComponent.instance(),
+        'shouldPerformAsyncValidation'
+      ).andReturn(true);
       renderedComponent.find('input').simulate('blur');
       expect(validator1).toHaveBeenCalled();
       expect(validator2).toHaveBeenCalled();

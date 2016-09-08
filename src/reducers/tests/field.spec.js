@@ -1,7 +1,7 @@
 import expect from 'expect';
 import { Set } from 'immutable';
 
-import { field } from '../field';
+import { field, Field, fieldNeedsValidation } from '../field';
 import * as actions from '../../actions';
 import * as validatorReducer from '../validators';
 
@@ -111,6 +111,31 @@ describe('the field reducer', () => {
       // Begin test
       state = field(state, actions.requestAsyncValidation({ validator: 'id1' }));
       expect(state.get('asyncErrors')).toEqual(Set(['id2']));
+    });
+  });
+
+  describe('helper methods', () => {
+    describe('fieldNeedsValidation', () => {
+      it('should return true if the field needed validation before the change', () => {
+        const fieldObj = new Field({ name: 'field1', value: 'test', needsValidation: true });
+        expect(fieldNeedsValidation(fieldObj, 'notField1', 'test')).toEqual(fieldObj);
+      });
+      it('should return true if the field name matches the name of the field changed and the value is different', () => {
+        const fieldObj = new Field({ name: 'field1', value: 'test', needsValidation: false });
+        const expected = fieldObj.set('needsValidation', true);
+        expect(fieldNeedsValidation(fieldObj, 'field1', 'test2')).toEqual(expected);
+      });
+      it('should return false if the field name matches the name of the field changed and the value is same', () => {
+        const fieldObj = new Field({ name: 'field1', value: 'test', needsValidation: false });
+        const expected = fieldObj.set('needsValidation', false);
+        expect(fieldNeedsValidation(fieldObj, 'field1', 'test')).toEqual(expected);
+      });
+      it('should return false if the field name does not match the name of the field changed', () => {
+        const fieldObj = new Field({ name: 'field1', value: 'test', needsValidation: false });
+        const expected = fieldObj.set('needsValidation', false);
+        expect(fieldNeedsValidation(fieldObj, 'field2')).toEqual(expected);
+      });
+      it('should return true if the field contains a validator containg that field as a param');
     });
   });
 });

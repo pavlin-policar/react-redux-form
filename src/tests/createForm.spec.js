@@ -24,8 +24,8 @@ describe('createForm', () => {
       values: Map(),
       errors: Map(),
       isValid: false,
-      fieldNames: List(),
-      fieldsTouched: Map(),
+      needsValidation: false,
+      fields: Map(),
     };
     // Setup a test form component
     const FormComponent = createFormWrapper({
@@ -86,13 +86,17 @@ describe('createForm', () => {
           <FormComponent
             {...mapDispatchToProps}
             {...emptyMapStateToProps}
-            fieldNames={fields}
+            fields={Map({
+              foo: Map({ name: 'foo' }),
+              bar: Map({ name: 'bar' }),
+            })}
           />
         );
         const submitFunctionSpy = expect.createSpy();
         const handleSubmit = renderedComponent.instance().handleSubmit(submitFunctionSpy);
         handleSubmit({ preventDefault: () => {} });
 
+        console.log(mapDispatchToProps.touch.calls[0].arguments);
         expect(mapDispatchToProps.touch).toHaveBeenCalledWith({
           id: 'testForm',
           fields,

@@ -11,7 +11,12 @@ import {
   focus,
   blur,
 } from '../actions';
-import { getFieldValue, getFieldTouched } from '../selectors';
+import {
+  getFieldValue,
+  getFieldTouched,
+  getFieldNeedsValidation,
+  getFieldHasSyncErrors,
+} from '../selectors';
 
 
 /**
@@ -46,8 +51,10 @@ export function generateInputComponent(type, { validate = '', className } = {}) 
       onFocus: React.PropTypes.func,
       onBlur: React.PropTypes.func,
       // Connected values
-      value: React.PropTypes.string,
-      touched: React.PropTypes.bool,
+      value: React.PropTypes.string.isRequired,
+      touched: React.PropTypes.bool.isRequired,
+      needsValidation: React.PropTypes.bool.isRequired,
+      hasSyncErrors: React.PropTypes.bool.isRequired,
       // Dispatch methods
       blur: React.PropTypes.func,
       focus: React.PropTypes.func,
@@ -127,10 +134,14 @@ export function generateInputComponent(type, { validate = '', className } = {}) 
       });
     }
 
+    shouldPerformAsyncValidation() {
+      return this.props.needsValidation && !this.props.hasSyncErrors;
+    }
+
     onBlur() {
       const { formId, name, onBlur } = this.props;
       this.props.blur({ id: formId, name });
-      this.triggerAsyncValidation();
+      if (this.shouldPerformAsyncValidation()) this.triggerAsyncValidation();
       if (onBlur) onBlur();
     }
 
@@ -166,6 +177,8 @@ export default function generateInputField(...params) {
   const mapStateToProps = (state, { formId, name }) => ({
     value: getFieldValue(formId, name)(state),
     touched: getFieldTouched(formId, name)(state),
+    needsValidation: getFieldNeedsValidation(formId, name)(state),
+    hasSyncErrors: getFieldHasSyncErrors(formId, name)(state),
   });
   const mapDispatchToProps = (dispatch) => ({
     change: bindActionCreators(change, dispatch),
