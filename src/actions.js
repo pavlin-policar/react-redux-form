@@ -15,6 +15,7 @@ import {
   VALIDATION_REQUEST,
   VALIDATION_NO_ERRORS,
   VALIDATION_ERRORS,
+  CLEAR_FORM,
 } from './constants';
 
 
@@ -44,3 +45,5 @@ export const submitFailed = createAction(SUBMIT_FAILURE);
 export const requestAsyncValidation = createAction(VALIDATION_REQUEST);
 export const noAsyncErrors = createAction(VALIDATION_NO_ERRORS);
 export const receiveAsyncErrors = createAction(VALIDATION_ERRORS);
+
+export const clear = createAction(CLEAR_FORM);

@@ -82,5 +82,9 @@ describe('the forms reducer', () => {
       forms(undefined, actions.receiveAsyncErrors({}));
       expect(formReducer.form).toHaveBeenCalled();
     });
+    it('should propagate `clear` to the `form` reducer', () => {
+      forms(undefined, actions.clear({}));
+      expect(formReducer.form).toHaveBeenCalled();
+    });
   });
 });

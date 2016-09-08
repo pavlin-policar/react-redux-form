@@ -12,6 +12,7 @@ import {
   touch,
   submitSuccessful,
   submitFailed,
+  clear,
 } from './actions';
 import {
   getFormValues,
@@ -40,6 +41,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
       detachFromForm: React.PropTypes.func.isRequired,
       change: React.PropTypes.func.isRequired,
       touch: React.PropTypes.func.isRequired,
+      clear: React.PropTypes.func.isRequired,
       dispatch: React.PropTypes.func.isRequired,
     }
 
@@ -53,6 +55,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
       this.attach = this.attach.bind(this);
       this.detach = this.detach.bind(this);
       this.change = this.change.bind(this);
+      this.clear = this.clear.bind(this);
     }
 
     getChildContext() { return { form: this }; }
@@ -64,6 +67,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
         this.props.values !== nextProps.values ||
         this.props.errors !== nextProps.errors ||
         this.props.isValid !== nextProps.isValid ||
+        this.props.isSubmitting !== nextProps.isSubmitting ||
         this.props.fields !== nextProps.fields
       );
     }
@@ -73,6 +77,8 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
     attach(payload) { this.props.attachToForm({ ...payload, id }); }
     detach(payload) { this.props.detachFromForm({ ...payload, id }); }
     change(payload) { this.props.change({ ...payload, id }); }
+    /** Methods available to the form */
+    clear() { this.props.clear({ id }); }
 
     get id() { return id; }
 
@@ -103,10 +109,12 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
         'detachFromForm',
         'change',
         'touch',
+        'clear',
       ]);
       return React.Children.only(
         <FormComponent
           handleSubmit={this.handleSubmit}
+          clear={this.clear}
           {...propsToPass}
         />
       );
@@ -136,6 +144,7 @@ const createForm = (options) => (FormComponent) => {
     touch: bindActionCreators(touch, dispatch),
     submitSuccessful: bindActionCreators(submitSuccessful, dispatch),
     submitFailed: bindActionCreators(submitFailed, dispatch),
+    clear: bindActionCreators(clear, dispatch),
     dispatch,
   });
   return connect(mapStateToProps, mapDispatchToProps)(WrappedComponent);

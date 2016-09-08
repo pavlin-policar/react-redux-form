@@ -148,6 +148,47 @@ describe('the field reducer', () => {
     });
   });
 
+  describe('clearing the form', () => {
+    it('should clear its value to an empty string', () => {
+      const initialState = field(undefined, actions.attachToForm({
+        name: 'field',
+        initialValue: 'value',
+      }));
+      const state = field(initialState, actions.clear({}));
+      expect(state.get('value')).toBe('');
+    });
+
+    it('should clear its `serverErrors`', () => {
+      let initialState = field(undefined, actions.attachToForm(
+        { name: 'field' }
+      ));
+      initialState = field(initialState, actions.submitFailed(
+        { errors: { field: ['error1', 'error2'] } }
+      ));
+      const state = field(initialState, actions.clear());
+      expect(state.get('serverErrors').isEmpty()).toBe(true);
+    });
+
+    it('should clear its `asyncErrors`', () => {
+      let initialState = field(undefined, actions.attachToForm(
+        { name: 'field' }
+      ));
+      initialState = field(initialState, actions.receiveAsyncErrors(
+        { errors: { field: ['error1', 'error2'] } }
+      ));
+      const state = field(initialState, actions.clear());
+      expect(state.get('asyncErrors').isEmpty()).toBe(true);
+    });
+
+    it('should clear its `syncErrors`', () => {
+      const initialState = new Field({
+        syncErrors: Set(['error1', 'error2']),
+      });
+      const state = field(initialState, actions.clear());
+      expect(state.get('syncErrors').isEmpty()).toBe(true);
+    });
+  });
+
   describe('helper methods', () => {
     describe('fieldNeedsValidation', () => {
       it('should return true if the field needed validation before the change', () => {

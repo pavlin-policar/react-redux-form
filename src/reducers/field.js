@@ -16,6 +16,7 @@ import {
   VALIDATION_REQUEST,
   VALIDATION_NO_ERRORS,
   VALIDATION_ERRORS,
+  CLEAR_FORM,
 } from '../constants';
 
 
@@ -127,6 +128,13 @@ export const field = (state = new Field(), action) => {
         'asyncErrors',
         state.get('asyncErrors').add(payload.validator)
       );
+      return state;
+    }
+    case CLEAR_FORM: {
+      state = state.set('value', '');
+      state = state.set('serverErrors', state.get('serverErrors').clear());
+      state = state.set('asyncErrors', state.get('asyncErrors').clear());
+      state = state.set('syncErrors', state.get('syncErrors').clear());
       return state;
     }
     default:

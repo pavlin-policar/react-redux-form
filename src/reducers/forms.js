@@ -16,6 +16,7 @@ import {
   VALIDATION_REQUEST,
   VALIDATION_NO_ERRORS,
   VALIDATION_ERRORS,
+  CLEAR_FORM,
 } from '../constants';
 
 
@@ -44,6 +45,7 @@ export const forms = (state = new Map(), action) => {
     case VALIDATION_REQUEST:
     case VALIDATION_NO_ERRORS:
     case VALIDATION_ERRORS:
+    case CLEAR_FORM:
       return state.set(payload.id, form(state.get(payload.id), action));
     default:
       return state;

@@ -60,6 +60,23 @@ describe('the form reducer', () => {
     });
   });
 
+  describe('clearing the form', () => {
+    beforeEach(() => {
+      expect.spyOn(fieldReducer, 'field').andCallThrough();
+    });
+    afterEach(() => {
+      expect.restoreSpies();
+    });
+
+    it('should let the `field` reducer handle `clear` and update its own field', () => {
+      const initialState = form(undefined, actions.attachToForm(
+        { name: 'field', initialValue: 'value' }
+      ));
+      form(initialState, actions.clear({}));
+      expect(fieldReducer.field).toHaveBeenCalled();
+    });
+  });
+
   describe('helper methods', () => {
     describe('getFormData', () => {
       it('should extract any form data from a form', () => {

@@ -23,3 +23,5 @@ export const SUBMIT_FAILURE = '@@Form.SUBMIT_FAILURE';
 export const VALIDATION_REQUEST = '@@Form.VALIDATION_REQUEST';
 export const VALIDATION_NO_ERRORS = '@@Form.VALIDATION_NO_ERRORS';
 export const VALIDATION_ERRORS = '@@Form.VALIDATION_ERRORS';
+
+export const CLEAR_FORM = '@@Form.CLEAR_FORM';

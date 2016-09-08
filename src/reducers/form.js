@@ -14,6 +14,7 @@ import {
   VALIDATION_REQUEST,
   VALIDATION_NO_ERRORS,
   VALIDATION_ERRORS,
+  CLEAR_FORM,
 } from '../constants';
 import * as validationFunctions from '../validators';
 import { field, fieldNeedsValidation } from './field';
@@ -72,8 +73,6 @@ export const form = (state = new Form(), action) => {
     }
     case DETACH_FROM_FORM:
       return state.removeIn(['fields', payload.name]);
-    case TOUCH:
-      return state.set('fields', state.get('fields').map(f => field(f, action)));
     case CHANGE: {
       state = state.set(
         'fields',
@@ -94,13 +93,20 @@ export const form = (state = new Form(), action) => {
       state = state.set('fields', state.get('fields').map(f => field(f, action)));
       return state;
     }
+    // Change just one field specified by the `name`
     case BLUR:
     case VALIDATION_REQUEST:
     case VALIDATION_NO_ERRORS:
     case VALIDATION_ERRORS: {
-      const newField = field(state.getIn(['fields', payload.name]), action);
-      return state.setIn(['fields', payload.name], newField);
+      return state.setIn(
+        ['fields', payload.name],
+        field(state.getIn(['fields', payload.name]), action)
+      );
     }
+    // Map over all the fields
+    case TOUCH:
+    case CLEAR_FORM:
+      return state.set('fields', state.get('fields').map(f => field(f, action)));
     default:
       return state;
   }
