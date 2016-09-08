@@ -41,7 +41,7 @@ function* validateWatcher() {
  * SUBMIT
  */
 export function* submit({ payload, meta }) {
-  const { successActionType, failureActionType } = meta;
+  const { successActionType, failureActionType, onSubmitSuccess, onSubmitFailure } = meta;
   const { id, action } = payload;
 
   // Dispatch the initial form request action
@@ -56,9 +56,11 @@ export function* submit({ payload, meta }) {
   if (responseStatus.success) {
     const data = responseStatus.success.payload;
     yield put(submitSuccessful({ id, data }));
+    if (onSubmitSuccess) onSubmitSuccess();
   } else {
     const { errors } = responseStatus.failure.payload.error;
     yield put(submitFailed({ id, errors }));
+    if (onSubmitFailure) onSubmitFailure();
   }
 }
 

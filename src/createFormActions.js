@@ -20,9 +20,9 @@ import { SUBMIT_REQUEST, VALIDATION_REQUEST } from './constants';
 export const createFormSubmitAction = (requestAction, types) => {
   const [successActionType, failureActionType] = types;
 
-  return (id, data) => ({
+  return (id, data, { onSubmitSuccess, onSubmitFailure } = {}) => ({
     type: SUBMIT_REQUEST,
-    meta: { successActionType, failureActionType },
+    meta: { successActionType, failureActionType, onSubmitSuccess, onSubmitFailure },
     payload: {
       id,
       action: requestAction(data),
