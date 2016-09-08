@@ -96,7 +96,6 @@ describe('createForm', () => {
         const handleSubmit = renderedComponent.instance().handleSubmit(submitFunctionSpy);
         handleSubmit({ preventDefault: () => {} });
 
-        console.log(mapDispatchToProps.touch.calls[0].arguments);
         expect(mapDispatchToProps.touch).toHaveBeenCalledWith({
           id: 'testForm',
           fields,
