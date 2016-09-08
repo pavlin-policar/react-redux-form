@@ -1,6 +1,6 @@
 {
   "name": "@policar/react-redux-form",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "scripts": {
     "prebuild": "npm run clean && npm run test",
     "build": "babel src --out-dir lib --ignore tests",
