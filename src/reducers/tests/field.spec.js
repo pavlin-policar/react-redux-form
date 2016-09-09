@@ -187,6 +187,28 @@ describe('the field reducer', () => {
       const state = field(initialState, actions.clear());
       expect(state.get('syncErrors').isEmpty()).toBe(true);
     });
+
+    it('should only clear the data of the specified fields (if multiple specified)', () => {
+      const initialState = new Field({
+        name: 'field',
+        syncErrors: Set(['error1', 'error2']),
+      });
+      let state = field(initialState, actions.clear(['notField']));
+      expect(state.get('syncErrors').isEmpty()).toBe(false);
+      state = field(initialState, actions.clear('field'));
+      expect(state.get('syncErrors').isEmpty()).toBe(true);
+    });
+
+    it('should only clear the data of the specified fields (if single specified)', () => {
+      const initialState = new Field({
+        name: 'field',
+        syncErrors: Set(['error1', 'error2']),
+      });
+      let state = field(initialState, actions.clear('notField'));
+      expect(state.get('syncErrors').isEmpty()).toBe(false);
+      state = field(initialState, actions.clear('field'));
+      expect(state.get('syncErrors').isEmpty()).toBe(true);
+    });
   });
 
   describe('helper methods', () => {

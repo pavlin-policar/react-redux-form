@@ -131,6 +131,12 @@ export const field = (state = new Field(), action) => {
       return state;
     }
     case CLEAR_FORM: {
+      if (
+        (payload instanceof Array && !payload.includes(state.get('name'))) ||
+        (typeof payload === 'string' && payload !== state.get('name'))
+      ) {
+        return state;
+      }
       state = state.set('value', '');
       state = state.set('serverErrors', state.get('serverErrors').clear());
       state = state.set('asyncErrors', state.get('asyncErrors').clear());
