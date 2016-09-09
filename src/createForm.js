@@ -78,7 +78,7 @@ const createFormWrapper = ({ id }) => (FormComponent) =>
     detach(payload) { this.props.detachFromForm({ ...payload, id }); }
     change(payload) { this.props.change({ ...payload, id }); }
     /** Methods available to the form */
-    clear() { this.props.clear({ id }); }
+    clear(fields) { this.props.clear({ id, fields }); }
 
     get id() { return id; }
 
