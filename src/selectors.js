@@ -31,10 +31,15 @@ export const getFormValues = (id) => createSelector(
   fields => fields.map(f => f.get('value'))
 );
 export const getFormErrors = (id) => createSelector(
+  getForm(id),
   getFormFields(id),
-  fields => fields.map(f =>
-    f.get('syncErrors').merge(f.get('asyncErrors').merge(f.get('serverErrors')))
-  ) || Map()
+  (form, fields) => {
+    const fieldErrors = fields.map(
+      f => f.get('syncErrors').merge(f.get('asyncErrors').merge(f.get('serverErrors')))
+    ) || Map();
+    const allErrors = fieldErrors.set('form', form.get('errors') || Set());
+    return allErrors;
+  }
 );
 export const getFormIsValid = (id) => createSelector(
   getFormErrors(id),

@@ -193,20 +193,31 @@ describe('the field reducer', () => {
         name: 'field',
         syncErrors: Set(['error1', 'error2']),
       });
-      let state = field(initialState, actions.clear(['notField']));
+      let state = field(initialState, actions.clear({ fields: ['notField'] }));
       expect(state.get('syncErrors').isEmpty()).toBe(false);
-      state = field(initialState, actions.clear('field'));
+      state = field(initialState, actions.clear({ fields: ['field'] }));
       expect(state.get('syncErrors').isEmpty()).toBe(true);
     });
 
-    it('should only clear the data of the specified fields (if single specified)', () => {
+    it('should only clear the data of the specified fields (if single specified with array)', () => {
       const initialState = new Field({
         name: 'field',
         syncErrors: Set(['error1', 'error2']),
       });
-      let state = field(initialState, actions.clear('notField'));
+      let state = field(initialState, actions.clear({ fields: ['notField'] }));
       expect(state.get('syncErrors').isEmpty()).toBe(false);
-      state = field(initialState, actions.clear('field'));
+      state = field(initialState, actions.clear({ fields: ['field'] }));
+      expect(state.get('syncErrors').isEmpty()).toBe(true);
+    });
+
+    it('should only clear the data of the specified fields (if single specified with string)', () => {
+      const initialState = new Field({
+        name: 'field',
+        syncErrors: Set(['error1', 'error2']),
+      });
+      let state = field(initialState, actions.clear({ fields: 'notField' }));
+      expect(state.get('syncErrors').isEmpty()).toBe(false);
+      state = field(initialState, actions.clear({ fields: 'field' }));
       expect(state.get('syncErrors').isEmpty()).toBe(true);
     });
   });

@@ -115,6 +115,7 @@ describe('form state', () => {
           field1: Set(['validation1', 'validation2']),
           field2: Set(['validation3']),
           field3: Set(),
+          form: Set(),
         }));
       });
     });
@@ -224,8 +225,9 @@ describe('form state', () => {
       ).toEqual(Map({
         field1: Set(['required']),
         field2: Set(['required']),
-        field3: Set(['length']) }
-      ));
+        field3: Set(['length']),
+        form: Set(),
+      }));
     });
   });
 

@@ -58,6 +58,7 @@ export const validateForm = (form) => form.set(
 export const Form = Record({
   id: '',
   fields: Map(),
+  errors: Set(),
   submitting: false,
 });
 export const form = (state = new Form(), action) => {
@@ -74,6 +75,7 @@ export const form = (state = new Form(), action) => {
     case DETACH_FROM_FORM:
       return state.removeIn(['fields', payload.name]);
     case CHANGE: {
+      state = state.set('errors', state.get('errors').clear());
       state = state.set(
         'fields',
         state.get('fields').map(f => fieldNeedsValidation(f, payload.name, payload.value))
@@ -86,11 +88,17 @@ export const form = (state = new Form(), action) => {
       return state;
     }
     case SUBMIT_REQUEST:
-      return state.set('submitting', true);
-    case SUBMIT_SUCCESS:
+      state = state.set('submitting', true);
+      return state;
+    case SUBMIT_SUCCESS: {
+      state = state.set('submitting', false);
+      state = state.set('fields', state.get('fields').map(f => field(f, action)));
+      return state;
+    }
     case SUBMIT_FAILURE: {
       state = state.set('submitting', false);
       state = state.set('fields', state.get('fields').map(f => field(f, action)));
+      state = state.set('errors', Set(payload.errors.form));
       return state;
     }
     // Change just one field specified by the `name`

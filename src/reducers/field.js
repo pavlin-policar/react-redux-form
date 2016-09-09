@@ -131,7 +131,7 @@ export const field = (state = new Field(), action) => {
       return state;
     }
     case CLEAR_FORM: {
-      if(
+      if (
         payload && (
           (payload.fields instanceof Array && !payload.fields.includes(state.get('name'))) ||
           (typeof payload.fields === 'string' && payload.fields !== state.get('name'))

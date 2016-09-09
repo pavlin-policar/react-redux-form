@@ -1,5 +1,5 @@
 import expect from 'expect';
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 
 import { form, getFormData, validateValue } from '../form';
 import * as actions from '../../actions';
@@ -27,6 +27,13 @@ describe('the form reducer', () => {
   describe('changing the value', () => {
     it('should revalidate the entire form');
     it('should propagate the action to the `field` reducer');
+    it('should clear its `errors` field', () => {
+      const initialState = form(undefined, actions.submitFailed(
+        { errors: { form: ['invalid'] } }
+      ));
+      const state = form(initialState, actions.change({}));
+      expect(state.get('errors').isEmpty()).toBe(true);
+    });
   });
 
   describe('a submit request', () => {
@@ -36,6 +43,12 @@ describe('the form reducer', () => {
   describe('a submission response', () => {
     it('should set the `submitting` flag to false');
     it('should propagate the action to the `field` reducer');
+    it('should set its `errors` field if any is sent back on submit failure', () => {
+      const state = form(undefined, actions.submitFailed(
+        { errors: { form: ['invalid'] } }
+      ));
+      expect(state.get('errors')).toEqual(Set(['invalid']));
+    });
   });
 
   describe('async validation', () => {
