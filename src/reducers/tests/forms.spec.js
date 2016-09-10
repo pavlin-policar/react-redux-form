@@ -1,4 +1,5 @@
 import expect from 'expect';
+import { Map } from 'immutable';
 
 import * as actions from '../../actions';
 import { forms } from '../forms';
@@ -39,7 +40,9 @@ describe('the forms reducer', () => {
       expect(formReducer.form).toHaveBeenCalled();
     });
     it('should propagate `detachFromForm` to the `form` reducer', () => {
-      forms(undefined, actions.detachFromForm({}));
+      // This form needs an id since detaching form a non-existing form does not
+      // work. This is intentional.
+      forms(Map({ form: true }), actions.detachFromForm({ id: 'form' }));
       expect(formReducer.form).toHaveBeenCalled();
     });
     it('should propagate `change` to the `form` reducer', () => {

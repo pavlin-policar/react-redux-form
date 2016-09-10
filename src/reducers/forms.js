@@ -32,9 +32,16 @@ export const forms = (state = new Map(), action) => {
       return state.set(payload, form(undefined, action));
     case UNREGISTER_FORM:
       return state.remove(payload);
+    case DETACH_FROM_FORM:
+      // Due to react lifecycle, the form unmounts before its children, so the
+      // DETACH_FROM_FORM action triggers after UNREGISTER. Due to this, a new
+      // form was created in the state with no fields. This prevents that
+      // behaviour.
+      return state.has(payload.id) ?
+        state.set(payload.id, form(state.get(payload.id), action)) :
+        state;
     // For everything else, just pass down to form
     case ATTACH_TO_FORM:
-    case DETACH_FROM_FORM:
     case CHANGE:
     case FOCUS:
     case BLUR:
